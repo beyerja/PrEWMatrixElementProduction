@@ -1,0 +1,319 @@
+subroutine TGCinit (TGCpar)
+	use omega_kinds
+	use omega_parameters
+	
+	real(kind=omega_prec), dimension(8), intent(in) :: TGCpar
+	real(kind=omega_prec) :: Parg1a, Parg1z, Parg4a, Parg4z, Parka, Parkz, Parla, Parlz
+	
+	Parg1a = TGCpar(1)
+	Parg1z = TGCpar(2)
+	Parg4a = TGCpar(3)
+	Parg4z = TGCpar(4)
+	Parka = TGCpar(5)
+	Parkz = TGCpar(6)
+	Parla = TGCpar(7)
+	Parlz = TGCpar(8)
+	call setup_parameters()
+	ig1a = iqw * Parg1a
+    ig1z = igzww * Parg1z
+    ig1pkpg4a = iqw   * (Parg1a + Parka + Parg4a) / 2
+    ig1pkpg4z = igzww * (Parg1z + Parkz + Parg4z) / 2
+    ig1pkmg4a = iqw   * (Parg1a + Parka - Parg4a) / 2
+    ig1pkmg4z = igzww * (Parg1z + Parkz - Parg4z) / 2
+    ig1mkpg4a = iqw   * (Parg1a - Parka + Parg4a) / 2
+    ig1mkpg4z = igzww * (Parg1z - Parkz + Parg4z) / 2
+    ig1mkmg4a = iqw   * (Parg1a - Parka - Parg4a) / 2
+    ig1mkmg4z = igzww * (Parg1z - Parkz - Parg4z) / 2
+    ila = iqw   * Parla / (mass(24)*mass(24))
+    ilz = igzww * Parlz / (mass(24)*mass(24))
+end subroutine TGCinit
+
+
+program testww_sl0muq
+! compile and link with:
+!   /usr/bin/gfortran -I. -I../omega-src/bundle/lib/ testww_sl0muq.F90 -L. -lproc -L../omega-src/bundle/lib/ -l omega95
+! in processes-src
+ 
+use omega_kinds
+use omega_parameters
+use omega95
+use MathOperations
+use ww_sl0muq
+!  in the module:
+!  public :: scatter_nonzero,  scatter_diagonal_nonzero, &
+!    scatter_diagonal_colored_nz, scatter_colored_nonzero
+!  ie. callable form the outside
+
+implicit none
+integer, dimension(4,1,16,1) :: zero_ct
+integer :: n,i,j, fi, fo, f, hi, ho, h, filestat
+integer :: ith, iph, ithq, iphq, ithl, iphl, imWp, imWm
+integer :: th_steps, ph_steps, thq_steps, phq_steps, thl_steps, phl_steps, mWp_steps, mWm_steps
+
+! 0:3 = four-vector (probablY)
+! 8 = total number of in- and out- particle 
+real(kind=omega_prec), dimension(0:3,6) :: p 
+real(kind=omega_prec), dimension(4,4) :: polarization
+real(kind=omega_prec), dimension(0:3) :: p1,p2,p3,p4,p5,p6
+real(kind=omega_prec), dimension(0:3) :: W,Wb
+real(kind=omega_prec), dimension(0:3) :: Wpboost, Wmboost
+real(kind=omega_prec), dimension(3) :: momentumW,directionW,directionl,directionq
+real(kind=omega_prec), dimension(8) :: aTGCpar
+real(kind=omega_prec), dimension(2,4) :: MatrixElement
+real(kind=omega_prec) :: th, ph, thq, phq, thl, phl, mWp, mWm, Wrange, E, currentWmomentum
+type(spinor) :: psi
+type(momentum) :: inputmomentum
+real(kind=omega_prec), dimension(2) :: A
+integer :: num_args, ix
+character(len=12), dimension(:), allocatable :: args
+
+! 4 = total number of initial helicities
+! 16 = ditto, final
+
+real(kind=omega_prec), dimension(4,1) :: rho_in
+real(kind=omega_prec), dimension(16,4) :: rho_out
+character(len=1024) :: filename
+
+filename = "grid_testww_sl0muq"
+num_args = command_argument_count()
+allocate(args(num_args))  ! I've omitted checking the return status of the allocation 
+do ix = 1, num_args
+	call get_command_argument(ix,args(ix))
+	filename = trim(filename) // "_" // trim(args(ix))
+	read (args(ix),*) A(ix)
+end do
+filename = trim(filename) // ".txt"
+
+print *, trim(filename), num_args,A(1:2)
+
+n=6
+aTGCpar = [ 20._8, 1._8, 0._8, 0._8, 1._8, 1._8, 0._8, 0._8 ]
+call TGCinit( aTGCpar )
+!call setup_parameters()
+!call print_parameters ()
+p(0:3,1) = [ 125._omega_prec , 0._omega_prec, 0._omega_prec, 125._omega_prec]
+p(0:3,2) = [ 125._omega_prec , 0._omega_prec, 0._omega_prec, -125._omega_prec]
+th = PI / 4.
+ph = 0.
+thq = PI / 4.
+phq = 0.
+thl = PI / 4.
+phl = 0.
+print *, mass(24)
+!print *, p1
+W(0) = 125
+! W(1) = sqrt( (W(0)**2._omega_prec) - (mass(24)**2._omega_prec) )*sin(th)*cos(ph)
+! W(2) = sqrt( (W(0)**2._omega_prec) - (mass(24)**2._omega_prec) )*sin(th)*sin(ph)
+! W(3) = sqrt( (W(0)**2._omega_prec) - (mass(24)**2._omega_prec) )*cos(th)
+currentWmomentum = sqrt( (W(0)**2._omega_prec) - (mass(24)**2._omega_prec) )
+call SphereCoordinate( momentumW, currentWmomentum, th, ph)
+W(1:3) = momentumW(1:3)
+p1(0) = mass(24)*0.5_omega_prec
+p1(1) = p1(0) * sin(th)*cos(ph+PI/2._omega_prec)
+p1(2) = p1(0) * sin(th)*sin(ph+PI/2._omega_prec)
+p1(3) = p1(0) * cos(th)
+! p1 = [ mass(24)*0.5_omega_prec, mass(24)*0.5_omega_prec*sin(th)*cos(ph+PI/2._omega_prec), mass(24)*0.5_omega_prec*sin(th)*sin(ph+PI/2._omega_prec), mass(24)*0.5_omega_prec*cos(th) ]
+p2(0) = p1(0)
+p2(1:3) = -p1(1:3)
+print *, p1
+print *, p2
+! p2 = p1
+! do i=1,3
+! 	p2(i) = -p2(i)
+! end do
+!print *, W
+Wpboost=W
+call lorentzBOOST(Wpboost, p2, p(0:3,3) )
+call lorentzBOOST(Wpboost, p1, p(0:3,4) )
+do i=1,3
+	Wpboost(i) = -Wpboost(i)
+end do
+call lorentzBOOST(Wpboost, p1, p(0:3,5) )
+call lorentzBOOST(Wpboost, p2, p(0:3,6) )
+call lorentzBOOST(W,W,Wb)
+print *, Wb
+rho_in = 0
+!print *, rho_in(1:4,1)
+! rho_in(1:4,1) = [ 0.25_omega_prec, 0.25_omega_prec, 0.25_omega_prec, 0.25_omega_prec ]
+! rho_in(1:4,1) = [ 1._omega_prec, 0._omega_prec, 0._omega_prec, 0._omega_prec ]
+! rho_in(1:4,1) = [ 0._omega_prec, 1._omega_prec, 0._omega_prec, 0._omega_prec ]
+! rho_in(1:4,1) = [ 0._omega_prec, 0._omega_prec, 1._omega_prec, 0._omega_prec ]
+! rho_in(1:4,1) = [ 0._omega_prec, 0._omega_prec, 0._omega_prec, 1._omega_prec ]
+ rho_in(1:4,1) = [ 0._omega_prec, 0.5_omega_prec, 0.5_omega_prec, 0._omega_prec ]
+print *, rho_in(1:4,1)
+do hi = 1, 4
+do ho = 1, 16
+	zero_ct(hi,1,ho,1) = 0
+end do
+end do
+inputmomentum%t = p1(0)
+do i=1,3
+	inputmomentum%x(i) = p1(i)
+end do
+psi = u(1._omega_prec,inputmomentum,-1)
+!print *, psi
+print *, 'Momentums: '
+do i=1,6
+	print *, p(0:3,i)
+end do
+ call scatter_diagonal_nonzero (p, rho_in, rho_out, zero_ct, n)
+ print *, 'Matrix elements:'
+ do i = 1,16
+   print *, rho_out(i,1:4)
+ end do
+!do i=1,16
+!	print *, i, zero_ct(1:4,1,i,1)
+!end do
+zero_ct=0
+n=0
+ rho_in(1:4,1) = [ 0._omega_prec, 1._omega_prec, 0._omega_prec, 0._omega_prec ]
+! rho_in(1:4,1) = [ 0._omega_prec, 0._omega_prec, 1._omega_prec, 0._omega_prec ]
+
+polarization(1:4,1) = [ 1._omega_prec, 0._omega_prec, 0._omega_prec, 0._omega_prec ]
+polarization(1:4,2) = [ 0._omega_prec, 1._omega_prec, 0._omega_prec, 0._omega_prec ]
+polarization(1:4,3) = [ 0._omega_prec, 0._omega_prec, 1._omega_prec, 0._omega_prec ]
+polarization(1:4,4) = [ 0._omega_prec, 0._omega_prec, 0._omega_prec, 1._omega_prec ]
+th_steps = 0
+thl_steps = 1
+phl_steps = 1
+thq_steps = 1
+phq_steps = 1
+ph_steps = 10
+mWp_steps = 1
+mWm_steps = 1
+Wrange = 2 * width(24)
+p(0:3,1) = [ 125._omega_prec , 0._omega_prec, 0._omega_prec, 125._omega_prec]
+p(0:3,2) = [ 125._omega_prec , 0._omega_prec, 0._omega_prec, -125._omega_prec]
+open(30,file=trim(filename),iostat=filestat)
+if(filestat==0) then
+	do ith=1,th_steps
+		th = ( PI / dble(th_steps) ) * dble( ith )
+	do ithl=1,thl_steps
+		thl = ( PI / dble(thl_steps) ) * dble( ithl ) 
+	do iphl=1,phl_steps
+		phl = ( 2_omega_prec * PI / dble(phl_steps) ) * dble( iphl  )
+		directionl(1) = sin(thl)*cos(phl)
+		directionl(2) = sin(thl)*sin(phl)
+		directionl(3) = cos(thl)
+	do ithq=1,thq_steps
+		thq = ( PI / dble(thq_steps) ) * dble( ithq )
+	do iphq=1,phq_steps
+		phq = ( 2_omega_prec * PI / dble(phq_steps) ) * dble( iphq )
+		directionq(1) = sin(thq)*cos(phq)
+		directionq(2) = sin(thq)*sin(phq)
+		directionq(3) = cos(thq)
+		MatrixElement(1:2,1:4) = 0
+		do iph=1,ph_steps
+			ph = ( 2_omega_prec * PI / dble(ph_steps) ) * dble( iph  )
+			directionW(1) = sin(th)*cos(ph)
+			directionW(2) = sin(th)*sin(ph)
+			directionW(3) = cos(th)
+		do imWp=1,mWp_steps
+		mWp = ( ( 2_omega_prec * Wrange / dble(mWp_steps+1) ) * dble( imWp ) ) + mass(24) - Wrange
+		do imWm=1,mWm_steps
+		mWm = ( ( 2_omega_prec * Wrange / dble(mWm_steps+1) ) * dble( imWm  ) ) + mass(24) - Wrange			
+			E = p(0,1) + p(0,2)
+			Wmboost(0) = ( E + ( ( mWm**2 - mWp**2 ) / E ) )  / 2_omega_prec
+			currentWmomentum = sqrt( Wmboost(0)**2 - mWm**2 )
+			Wmboost(1:3) = - currentWmomentum * directionW(1:3)
+			
+			Wpboost(0) = E - Wmboost(0)
+			Wpboost(1:3) = -Wmboost(1:3)
+			
+			
+			
+			p5(0) = ( mWm + ( ( mass(13)**2 - mass(14)**2 ) / mWm ) )  / 2_omega_prec
+			currentWmomentum = sqrt( p5(0)**2 - mass(13)**2 )
+			p5(1:3) = - currentWmomentum * directionl(1:3)
+			
+			p6(0) = mWm - p5(0)
+			p6(1:3) = -p5(1:3)
+			
+			p4(0) = ( mWp + ( ( mass(1)**2 - mass(2)**2 ) / mWp ) )  / 2_omega_prec
+			currentWmomentum = sqrt( p4(0)**2 - mass(1)**2 )
+			p4(1:3) = - currentWmomentum * directionq(1:3)
+			
+			p3(0) = mWp - p4(0)
+			p3(1:3) = -p4(1:3)
+									
+			call lorentzBOOST(Wpboost, p3, p(0:3,3) )
+			call lorentzBOOST(Wpboost, p4, p(0:3,4) )
+			call lorentzBOOST(Wmboost, p5, p(0:3,5) )
+			call lorentzBOOST(Wmboost, p6, p(0:3,6) )			
+			
+			zero_ct=0
+			n=0
+			
+			do j=1,4
+				rho_in(1:4,1) = polarization(1:4,j)
+				call scatter_diagonal_nonzero (p, rho_in, rho_out, zero_ct, n)
+				 do i = 1,16
+				   MatrixElement(1,j) = MatrixElement(1,j) + rho_out(i,1)
+				 end do
+			 end do
+			
+			
+			
+			p5(0) = ( mWp + ( ( mass(13)**2 - mass(14)**2 ) / mWp ) )  / 2_omega_prec
+			currentWmomentum = sqrt( p5(0)**2 - mass(13)**2 )
+			p5(1:3) = - currentWmomentum * directionl(1:3)
+			
+			p6(0) = mWp - p5(0)
+			p6(1:3) = -p5(1:3)
+			
+			p4(0) = ( mWm + ( ( mass(1)**2 - mass(2)**2 ) / mWm ) )  / 2_omega_prec
+			currentWmomentum = sqrt( p4(0)**2 - mass(1)**2 )
+			p4(1:3) = - currentWmomentum * directionq(1:3)
+			
+			p3(0) = mWm - p4(0)
+			p3(1:3) = -p4(1:3)
+									
+			call lorentzBOOST(Wmboost, p3, p(0:3,3) )
+			call lorentzBOOST(Wmboost, p4, p(0:3,4) )
+			call lorentzBOOST(Wpboost, p5, p(0:3,5) )
+			call lorentzBOOST(Wpboost, p6, p(0:3,6) )		
+			
+			zero_ct=0
+			n=0
+			
+			do j=1,4
+				rho_in(1:4,1) = polarization(1:4,j)
+				call scatter_diagonal_nonzero (p, rho_in, rho_out, zero_ct, n)
+				 do i = 1,16
+				   MatrixElement(2,j) = MatrixElement(2,j) + rho_out(i,4)
+				 end do
+			 end do	
+			 
+			 
+		end do
+		end do
+		end do
+		
+		write(30,*) th, thl, phl, thq, phq, MatrixElement(1,1:4)
+		write(30,*) th, thl, phl, thq, phq, MatrixElement(2,1:4)
+	end do	
+	end do
+	end do
+	end do
+	end do
+else
+	write(*,*) "File not opened: Terminating"
+end if
+close(30)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+end program testww_sl0muq

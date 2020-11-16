@@ -1,0 +1,62 @@
+ ######################################################
+ # HTCondor Submit Description File. COMMON TEMPLATE   
+ # Next commands should be added to all your submit files   
+ ######################################################
+
+# Run your script with arguments from inputs in submit_htc_jobs.sh:
+Executable = $ENV(PWD)/run_grid_ww_slmuq.sh
+#
+# Infos from your job:
+Output = $ENV(PWD)/job/run_grid_ww_slmuq_$(Cluster)_$(Process).out
+#
+# Contains only last error:
+Error = $ENV(PWD)/err/run_grid_ww_slmuq_$(Cluster)_$(Process).err
+#
+# Infos from the scheduler:
+Log = $ENV(PWD)/log/run_grid_ww_slmuq_$(Cluster)_$(Process).log
+#
+# Default Universe for normal jobs
+Universe = vanilla
+#
+# Until now we use shared file system:
+Should_Transfer_Files = NO
+#
+# Defaults to submit dir:
+InitialDir = $ENV(PWD)
+#InitialDir = $ENV(HOME)
+#
+# Test it:
+#Arguments = "sleep 600"
+#
+# Mailing requests:
+#notification = $<$Always | Complete | Error | Never$>$
+#
+# Your mail address:
+notify_user = jakob.beyer@desy.de
+#
+# As you need (see notify...)
+Notification = Error
+#
+# Defaults to 1 day:
+#+RequestRuntime = 3600 * 3
+#
+# Defaults to 3G
+#RequestDisk = 2048 * 3
+#
+# Defaults to 1500M:
+# RequestMemory = 1024 * 3
+#
+# Defaults to 1:
+#RequestCpus = 3
+#
+# Normally set by submit host:
+#+MyProject = "MyProject"
+#
+# Default:
+#Requirements = OpSysAndVer=="SL6"
+#
+# Default is 1 job per submit
+# Job Id is $(Cluster).$(Process) e.g. 20202.0
+request_cpus=1
+
+Queue 1
