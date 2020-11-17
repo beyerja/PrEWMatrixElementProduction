@@ -4,6 +4,7 @@ Code to produce matrix element level input for the PrEW fitting framework.
 
 ## Usage
 
+### 1. Compiling the O'Mega fortran code
 The `O'Mega` fortran code (`src/fortran`) can be compile using a prepared macro:
 
 ```bash
@@ -13,6 +14,19 @@ chmod u+x create_executables.sh
 ```
 
 This will create the binary executables for each process (in `bin`). The binaries can be called with the given bin-indices to extract the matrix element squared at that bin-index.
+
+### 2. Submitting the calculation to HTCondor
+
+The `run_process.sh` macro submits the calculation of the matrix element squared for each bin of the process as individual jobs.
+One needs to specify the process and the output base directory.
+
+```bash
+cd macros
+chmod u+x run_process.sh
+./run_process.sh --process=[ww_slmuq/ww_sleq/...] --output-base=[...]
+```
+
+This will create simple `.txt` files in a process-specific subdirectory of the given output base. The files contain the results of the `O'Mega` calculation.
 
 ## Disclaimers
 
