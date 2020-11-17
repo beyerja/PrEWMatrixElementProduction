@@ -28,6 +28,16 @@ chmod u+x run_process.sh
 
 This will create simple `.txt` files in a process-specific subdirectory of the given output base. The files contain the results of the `O'Mega` calculation.
 
+### 3. Convert O'Mega output to fit input
+
+The `assemble_distributions.sh` macro invokes all the necessary `ROOT` macros to create the fit input files. Please make sure that `ROOT` is loaded.
+
+```bash 
+cd macros
+chmod u+x assemble_distributions.sh
+./assemble_distributions.sh --process=[ww_sl0muq/...] --output-base=[...]
+```
+
 ## Disclaimers
 
 - The current code is specified to use a center-of-mass energy of 250GeV. 
