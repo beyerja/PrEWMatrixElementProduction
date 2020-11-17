@@ -34,6 +34,7 @@ use omega_kinds
 use omega_parameters
 use omega95
 use MathOperations
+use Rotation
 use ww_sl0muq
 
 implicit none
@@ -54,6 +55,9 @@ real(kind=omega_prec), dimension(0:3) :: p1,p2,p3,p4,p5,p6
 !real(kind=omega_prec), dimension(0:3) :: W,Wb
 real(kind=omega_prec), dimension(0:3) :: Wpboost, Wmboost
 real(kind=omega_prec), dimension(3) :: directionW,directionl,directionq
+real(kind=omega_prec), dimension(3) :: p_Wm, p_Wp, p_em
+real(kind=omega_prec), dimension(3) :: p_f_Wm_rot, p_f_Wp_rot
+real(kind=omega_prec), dimension (3,3) :: Wm_rotation, Wp_rotation
 real(kind=omega_prec), dimension(3) :: A
 real(kind=omega_prec), dimension(8) :: TGCpar
 real(kind=omega_prec), dimension(10) :: anomalousg, anomalousk, anomalousl
@@ -126,7 +130,10 @@ polarization(1:4,2) = [ 0._omega_prec, 1._omega_prec, 0._omega_prec, 0._omega_pr
 polarization(1:4,3) = [ 0._omega_prec, 0._omega_prec, 1._omega_prec, 0._omega_prec ]
 polarization(1:4,4) = [ 0._omega_prec, 0._omega_prec, 0._omega_prec, 1._omega_prec ]
 
-p(0:3,1) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec,  0.5_omega_prec * ECMS]
+! incoming e-
+p(0:3,1) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec,  0.5_omega_prec * ECMS] 
+p_em = p(1:3,1)
+! incoming e+
 p(0:3,2) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec, -0.5_omega_prec * ECMS]
 
 !th_steps = 20
@@ -209,23 +216,33 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			
 			!print *, " - " 		
 			
+      ! Calculate the W 4-momenta (2-body kinematics in ee system)
 			E = p(0,1) + p(0,2)
 			Wmboost(0) = ( E + ( ( mWm**2 - mWp**2 ) / E ) )  / 2_omega_prec
+      Wpboost(0) = E - Wmboost(0)
+      
 			currentWmomentum = sqrt( Wmboost(0)**2 - mWm**2 )
-			Wmboost(1:3) = - currentWmomentum * directionW(1:3)
-			
+      p_Wm = - currentWmomentum * directionW(1:3)
+      p_Wp = + currentWmomentum * directionW(1:3)
+      
+			Wmboost(1:3) = p_Wm
+      Wpboost(1:3) = -Wmboost(1:3)
+      
+      ! Rotation matrices to rotate out of the W rest frame coordinates in which W flight is z axis
+			Wm_rotation = rotate_out_of(p_em,p_Wm)
+			Wp_rotation = rotate_out_of(p_em,p_Wp)
+      
 			!print *, Wmboost(0:3)
-			
-			Wpboost(0) = E - Wmboost(0)
-			Wpboost(1:3) = -Wmboost(1:3)
-			
 			!print *, Wpboost(0:3)		
+      !print *, " - " 		
 			
-			!print *, " - " 		
-			
+      ! Calculate the fermion momenta in the W rest frame, includes undoing rotation
+      ! Here: Case that lepton is in W- system, below when it is in W+
 			p5(0) = ( mWm + ( ( mass(13)**2 - mass(14)**2 ) / mWm ) )  / 2_omega_prec
 			currentWmomentum = sqrt( p5(0)**2 - mass(13)**2 )
-			p5(1:3) = currentWmomentum * directionl(1:3)
+      p_f_Wm_rot = currentWmomentum * directionl(1:3)
+      p_f_Wm_rot = matmul(Wm_rotation, p_f_Wm_rot)
+			p5(1:3) = p_f_Wm_rot
 			
 			!print *, p5(0:3)
 			
@@ -236,7 +253,9 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			
 			p4(0) = ( mWp + ( ( mass(1)**2 - mass(2)**2 ) / mWp ) )  / 2_omega_prec
 			currentWmomentum = sqrt( p4(0)**2 - mass(1)**2 )
-			p4(1:3) = currentWmomentum * directionq(1:3)
+      p_f_Wp_rot = currentWmomentum * directionq(1:3)
+      p_f_Wp_rot = matmul(Wp_rotation, p_f_Wp_rot)
+			p4(1:3) = p_f_Wp_rot
 
 			!print *, p4(0:3)
 			
@@ -247,6 +266,7 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			
 			!print *, " - " 		
 				
+      ! Boost fermion momenta out of W system into detector/lab frame
 			call lorentzBOOST(Wpboost, p3, p(0:3,3) )
 			call lorentzBOOST(Wpboost, p4, p(0:3,4) )
 			call lorentzBOOST(Wmboost, p5, p(0:3,5) )
@@ -281,14 +301,18 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			
 			p5(0) = ( mWp + ( ( mass(13)**2 - mass(14)**2 ) / mWp ) )  / 2_omega_prec
 			currentWmomentum = sqrt( p5(0)**2 - mass(13)**2 )
-			p5(1:3) = currentWmomentum * directionl(1:3)
+      p_f_Wp_rot = currentWmomentum * directionl(1:3)
+      p_f_Wp_rot = matmul(Wp_rotation, p_f_Wp_rot)
+			p5(1:3) = p_f_Wp_rot
 			
 			p6(0) = mWp - p5(0)
 			p6(1:3) = -p5(1:3)
 
 			p4(0) = ( mWm + ( ( mass(1)**2 - mass(2)**2 ) / mWm ) )  / 2_omega_prec
 			currentWmomentum = sqrt( p4(0)**2 - mass(1)**2 )
-			p4(1:3) = currentWmomentum * directionq(1:3)
+      p_f_Wm_rot = currentWmomentum * directionq(1:3)
+      p_f_Wm_rot = matmul(Wm_rotation, p_f_Wm_rot)
+			p4(1:3) = p_f_Wm_rot
 			
 			p3(0) = mWm - p4(0)
 			p3(1:3) = -p4(1:3)
