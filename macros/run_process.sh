@@ -19,7 +19,7 @@ case $i in
     shift # past argument=value
   ;;
   -h|--help)
-    echo "usage: ./run_single_process.sh --process=[ww_slmuq/ww_sleq/...] --output-base=[...]"
+    echo "usage: ./run_process.sh --process=[ww_sl0muq/...] --output-base=[...]"
     shift # past argument=value
   ;;
   *)
@@ -65,7 +65,7 @@ fi
 bin_dir=${dir}/../bin
 bin_executable=${bin_dir}/grid_${process}.bin
 if ! test -f "$bin_executable"; then
-    echo "Binary ${bin_executable} not found!"; exit 1
+  >&2 echo "Binary ${bin_executable} not found!"; exit 1
 fi
 
 # ------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ if [[ ${process} == "ww_sl0muq" ]]; then
     done
   done
 else 
-  echo "Process ${process} unknown!"; exit 1
+  >&2 echo "Process ${process} unknown!"; exit 1
 fi
       
 # ------------------------------------------------------------------------------
