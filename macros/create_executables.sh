@@ -10,7 +10,7 @@
 # Path to this current script
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )" 
 
-src_dir="${dir}/../src"
+src_dir="${dir}/../src/fortran"
 omega_dir="${src_dir}/OMega"
 helper_dir="${src_dir}/Helpers"
 processes_dir="${src_dir}/Processes"
