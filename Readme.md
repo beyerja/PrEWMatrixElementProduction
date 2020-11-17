@@ -36,3 +36,20 @@ This will create simple `.txt` files in a process-specific subdirectory of the g
 - Most of the fortran and ROOT code has been copy-pasted blind from Robert Karls work.
   I did not clean it up and did not check most of it. 
   Good luck.
+  
+### Some notes on the cross sections applied
+
+Source of cross sections from Monte Carlo: 
+https://ilcsoft.desy.de/dbd/generated/250/4f_production/cross_list.txt
+
+#### For WW -> mu nubar q qbar
+ Factors:
+  - 0.5   -> Separation of mu+ and mu- final states
+  - 0.483 -> Removing tau final state (See PDG for W decays to tau and mu)
+
+chirality | cross section with factors
+---|---
+LR | 18781.00 * 0.5 * 0.483
+RL | 172.73 * 0.5 * 0.483
+LL | 0
+RR | 0
