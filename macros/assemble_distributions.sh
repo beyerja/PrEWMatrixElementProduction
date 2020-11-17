@@ -70,6 +70,9 @@ if [[ ! -d ${tmp_dir} ]] ; then # Create if not existing
 fi
 
 # Other needed output directories
+if [[ ! -d ${output_dir}/grids_root ]] ; then
+  mkdir -p ${output_dir}/grids_root
+fi
 if [[ ! -d ${output_dir}/distributions/angular ]] ; then
   mkdir -p ${output_dir}/distributions/angular
 fi
