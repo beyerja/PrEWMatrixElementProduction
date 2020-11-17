@@ -265,7 +265,7 @@ vector < vector < vector < double > > > &grid_R_elements,
 const unsigned int numbervariables,
 const unsigned int numberchiralities,
 const unsigned int MaxNumberRelements,
-vector < string > file_discription,
+vector < string > file_description,
 vector < vector < double > > chiral_scaling,
 string EnergyCMS,
 string TGCdeviation,
@@ -282,12 +282,12 @@ bool filebased_nomalization = false
 	string SM_elements_description = "SM";
 	string R_elements_description = "R";
 	
-	vector < vector < vector < double > > > grid_SM_elements_file_separated(file_discription.size());
-	vector < vector < vector < vector < double > > > > grid_R_elements_file_separated(file_discription.size());
+	vector < vector < vector < double > > > grid_SM_elements_file_separated(file_description.size());
+	vector < vector < vector < vector < double > > > > grid_R_elements_file_separated(file_description.size());
 	
-	for(unsigned int n = 0; n < file_discription.size(); n++){
+	for(unsigned int n = 0; n < file_description.size(); n++){
 
-		TFile* inputfile = new TFile( ( file_discription[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "READ" );
+		TFile* inputfile = new TFile( ( file_description[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "READ" );
 		if(inputfile->IsOpen()){
 			TTree* matrix_elements_distribution = (TTree*)inputfile->Get( "MatrixElements" );
 
@@ -337,13 +337,13 @@ bool filebased_nomalization = false
 			}
 		}
 		else{
-			cout << "File " << (file_discription[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root") << " could not be opend" << endl;
+			cout << "File " << (file_description[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root") << " could not be opend" << endl;
 		}
 		inputfile->Close();
 	}
 
 	if(filebased_nomalization){
-		for(unsigned int n = 0; n < file_discription.size(); n++){
+		for(unsigned int n = 0; n < file_description.size(); n++){
 			double sm_nborms[numberchiralities];
 			for(unsigned int chiral = 0; chiral < numberchiralities; chiral++){
 				sm_nborms[chiral]=0;
@@ -373,7 +373,7 @@ bool filebased_nomalization = false
 		}
 	}
 	
-	for(unsigned int n = 0; n < file_discription.size(); n++){
+	for(unsigned int n = 0; n < file_description.size(); n++){
 		for(unsigned int i = 0; i < grid_SM_elements_file_separated[n].size(); i++ ){
 			grid_SM_elements.push_back(grid_SM_elements_file_separated[n][i]);
 		}
@@ -1099,12 +1099,11 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	TCanvas* c;
 	string c_name;
 
-	vector < string > file_discription;
-  vector < string > file_discription;
+  vector < string > file_description;
   vector < vector < double > > scaling(2);
   if (process == "ww_sl0muq") {
-    file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
-    file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+    file_description.push_back("../grids/grid_ww_sl0muq_leptonic");
+    file_description.push_back("../grids/grid_ww_sl0muq_hadronic");
     scaling[0].push_back(1);
     scaling[0].push_back(1);
     scaling[0].push_back(1);
@@ -1116,8 +1115,8 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
   } else {
     throw std::invalid_argument("Unknown process " + process);
   }
-	//file_discription.push_back("../grids/grid_ww_sl0eq_leptonic");
-	//file_discription.push_back("../grids/grid_ww_sl0eq_hadronic");
+	//file_description.push_back("../grids/grid_ww_sl0eq_leptonic");
+	//file_description.push_back("../grids/grid_ww_sl0eq_hadronic");
 	
 	
 	
@@ -1140,8 +1139,8 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	//scaling[3].push_back(71.835 / 158.2);
 	//scaling[3].push_back(1);
 	
-	for(unsigned int i = 0; i < file_discription.size(); i++){
-		cout << file_discription[i] << "\t";
+	for(unsigned int i = 0; i < file_description.size(); i++){
+		cout << file_description[i] << "\t";
 		for(unsigned int j = 0; j < scaling[i].size(); j++){
 			cout << scaling[i][j] << "\t";
 		}
@@ -1164,7 +1163,7 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	const string TGCdeviation = "0.0001";
 	cout << "START" << endl;
 
-	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_discription, scaling, EnergyCMS, TGCdeviation );
+	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_description, scaling, EnergyCMS, TGCdeviation );
 	
 	const unsigned int number_angular_distributions = 3;
 	
@@ -1284,16 +1283,15 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	TCanvas* c;
 	string c_name;
 
-	vector < string > file_discription;
-  vector < string > file_discription;
+	vector < string > file_description;
   if (process == "ww_sl0muq") {
-    file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
-    file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+    file_description.push_back("../grids/grid_ww_sl0muq_leptonic");
+    file_description.push_back("../grids/grid_ww_sl0muq_hadronic");
   } else {
     throw std::invalid_argument("Unknown process " + process);
   }
-	//file_discription.push_back("../grids/grid_ww_sl0eq_leptonic");
-	//file_discription.push_back("../grids/grid_ww_sl0eq_hadronic");
+	//file_description.push_back("../grids/grid_ww_sl0eq_leptonic");
+	//file_description.push_back("../grids/grid_ww_sl0eq_hadronic");
 	
 	vector < vector < double > > scaling(2);
 	
@@ -1324,8 +1322,8 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	//scaling[3].push_back(71.835 / 158.2);
 	//scaling[3].push_back(1);
 	
-	for(unsigned int i = 0; i < file_discription.size(); i++){
-		cout << file_discription[i] << "\t";
+	for(unsigned int i = 0; i < file_description.size(); i++){
+		cout << file_description[i] << "\t";
 		for(unsigned int j = 0; j < scaling[i].size(); j++){
 			cout << scaling[i][j] << "\t";
 		}
@@ -1349,7 +1347,7 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	const string TGCdeviation = "0.0001";
 	cout << "START" << endl;
 
-	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_discription, scaling, EnergyCMS, TGCdeviation );
+	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_description, scaling, EnergyCMS, TGCdeviation );
 	
 	const unsigned int number_angular_distributions = 3;
 	
@@ -1481,7 +1479,7 @@ void CreateMultiProcessMultiAngularDistributions( string folder_angle, string fo
 	output_file_descriptions.push_back("WW_semilep_AntiMuNu");
 	
 	vector < vector < string > > input_file_descriptions(2);
-  vector < string > file_discription;
+  vector < string > file_description;
   if (process == "ww_sl0muq") {
     input_file_descriptions[0].push_back("grid_ww_sl0muq_leptonic");
     input_file_descriptions[1].push_back("grid_ww_sl0muq_hadronic");
@@ -1841,10 +1839,10 @@ void plot_angular_distribution(){
 	TCanvas* c;
 	string c_name;
 
-	vector < string > file_discription;
+	vector < string > file_description;
   if (process == "ww_sl0muq") {
-    file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_leptonic");
-    file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_hadronic");
+    file_description.push_back(output_dir + "/distributions/grid_ww_sl0muq_leptonic");
+    file_description.push_back(output_dir + "/distributions/grid_ww_sl0muq_hadronic");
   } else {
     throw std::invalid_argument("Unknown process " + process);
   }
@@ -1867,8 +1865,8 @@ void plot_angular_distribution(){
 	scaling[3].push_back(71.835 / 158.2);
 	scaling[3].push_back(1);
 	
-	for(unsigned int i = 0; i < file_discription.size(); i++){
-		cout << file_discription[i] << "\t";
+	for(unsigned int i = 0; i < file_description.size(); i++){
+		cout << file_description[i] << "\t";
 		for(unsigned int j = 0; j < scaling[i].size(); j++){
 			cout << scaling[i][j] << "\t";
 		}
@@ -1888,7 +1886,7 @@ void plot_angular_distribution(){
 	const string TGCdeviation = "0.0001";
 	cout << "START" << endl;
 
-	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_discription, scaling, EnergyCMS, TGCdeviation );
+	read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables, numberchiralities, MaxNumberRelements, file_description, scaling, EnergyCMS, TGCdeviation );
 	
 	int binning[numbervariables] = {20,10,10,10,10};
 	double range[numbervariables] = {TMath::Pi(),TMath::Pi(),2*TMath::Pi(),TMath::Pi(),2*TMath::Pi()};
