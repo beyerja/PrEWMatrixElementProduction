@@ -1094,7 +1094,7 @@ void plot_2d_hist(
 
 
 
-void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
+void CreateMultiAngularDistributions(){
 	
 	TCanvas* c;
 	string c_name;
@@ -1209,7 +1209,7 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	chiral_label.push_back("eRpL");
 	chiral_label.push_back("eRpR");
 	
-	write_angular_file( ( path_angular_distributions + folder_angle + "AngularDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",Distribution,center,width,chiral_label);
+	write_angular_file( ( path_angular_distributions + "AngularDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",Distribution,center,width,chiral_label);
 	
 	
 	vector < int > chirality_indices;
@@ -1256,7 +1256,7 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	}
 	
 	
-	write_PNPC_file( ( path_PNPC_distributions + folder_PNPC + "AngularTGCDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
+	write_PNPC_file( ( path_PNPC_distributions + "AngularTGCDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
 	
 	
 	
@@ -1278,7 +1278,7 @@ cout << "finished!" << endl;
 
 }
 
-void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
+void CreateSplitAngularDistributions(){
 	
 	TCanvas* c;
 	string c_name;
@@ -1366,7 +1366,7 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	chiral_label.push_back("eRpL");
 	chiral_label.push_back("eRpR");
 	
-	write_angular_file( ( path_angular_distributions + folder_angle + "AngularDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",Distribution,center,width,chiral_label);
+	write_angular_file( ( path_angular_distributions + "AngularDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",Distribution,center,width,chiral_label);
 	
 	
 	vector < int > chirality_indices;
@@ -1461,14 +1461,14 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	}
 	
 	
-	write_PNPC_file( ( path_PNPC_distributions + folder_PNPC + "AngularTGCDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
+	write_PNPC_file( ( path_PNPC_distributions + "AngularTGCDistribution_" + EnergyCMS + "_WW_semileptonic.root" ),"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
 
 
 cout << "finished!" << endl;
 
 }
 
-void CreateMultiProcessMultiAngularDistributions( string folder_angle, string folder_PNPC ){
+void CreateMultiProcessMultiAngularDistributions(){
 	
 	TCanvas* c;
 	string c_name;
@@ -1798,7 +1798,7 @@ void CreateMultiProcessMultiAngularDistributions( string folder_angle, string fo
 			}
 				
 			
-			write_angular_file( ( path_angular_distributions + folder_angle + "AngularDistribution_" + EnergyCMS + "_" + output_file_descriptions[i] + ".root" ),
+			write_angular_file( ( path_angular_distributions + "AngularDistribution_" + EnergyCMS + "_" + output_file_descriptions[i] + ".root" ),
 				"AngularDistribution",Distribution,center,width,chiral_label);
 						
 			if(MaxNumberRelements[i]>0){
@@ -1824,7 +1824,7 @@ void CreateMultiProcessMultiAngularDistributions( string folder_angle, string fo
 					PNPC_description.push_back( ( "TGC" + coefficient_labeling[j] ) );
 				}
 				
-				write_PNPC_file( ( path_PNPC_distributions + folder_PNPC + "AngularTGCDistribution_" + EnergyCMS + "_" + output_file_descriptions[i] + ".root" ),
+				write_PNPC_file( ( path_PNPC_distributions + "AngularTGCDistribution_" + EnergyCMS + "_" + output_file_descriptions[i] + ".root" ),
 					"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
 			}
 			
@@ -1963,7 +1963,7 @@ void CreateAngularDistributions(){
 	logfile.precision(16);
 	logfile << "" << endl;
 
-	CreateMultiProcessMultiAngularDistributions( output_dir + "/", output_dir + "/" );
+	CreateMultiProcessMultiAngularDistributions();
 	
 	cout << "done in " << time(0)-start_creating << "s" << endl;
 }

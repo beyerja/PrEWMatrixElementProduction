@@ -73,6 +73,9 @@ fi
 if [[ ! -d ${output_dir}/grids_root ]] ; then
   mkdir -p ${output_dir}/grids_root
 fi
+if [[ ! -d ${output_dir}/distributions/plots ]] ; then
+  mkdir -p ${output_dir}/distributions/plots
+fi
 if [[ ! -d ${output_dir}/distributions/angular ]] ; then
   mkdir -p ${output_dir}/distributions/angular
 fi
