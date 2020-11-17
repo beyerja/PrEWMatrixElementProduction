@@ -140,7 +140,7 @@ void GridAsciiToTTree(){
 	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(10);
 	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(1);
 	
-	const string input_path = output_dir + "/grids/";
+	const string input_path = output_dir + "/omega/";
 	const string output_path = output_dir + "/grids_root/";
 	
 	

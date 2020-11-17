@@ -70,14 +70,14 @@ if [[ ! -d ${tmp_dir} ]] ; then # Create if not existing
 fi
 
 # Other needed output directories
-if [[ ! -d ${output_base}/distributions/angular ]] ; then
-  mkdir -p ${output_base}/distributions/angular
+if [[ ! -d ${output_dir}/distributions/angular ]] ; then
+  mkdir -p ${output_dir}/distributions/angular
 fi
-if [[ ! -d ${output_base}/distributions/TGC ]] ; then
-  mkdir -p ${output_base}/distributions/TGC
+if [[ ! -d ${output_dir}/distributions/TGC ]] ; then
+  mkdir -p ${output_dir}/distributions/TGC
 fi
-if [[ ! -d ${output_base}/distributions/combined ]] ; then
-  mkdir -p ${output_base}/distributions/combined
+if [[ ! -d ${output_dir}/distributions/combined ]] ; then
+  mkdir -p ${output_dir}/distributions/combined
 fi
 
 # ------------------------------------------------------------------------------
