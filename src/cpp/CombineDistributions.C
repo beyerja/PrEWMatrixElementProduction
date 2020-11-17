@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------
 // Brute forcing this a bit, gonna replace these using bash scripts
 static const std::string process = 
-  PROCESS_MARKER
+  "PROCESS_MARKER"
 ;
 
 static const std::string output_dir = 
-  OUTPUT_DIR_MARKER
+  "OUTPUT_DIR_MARKER"
 ;
 
 static const int I_n_bins =
