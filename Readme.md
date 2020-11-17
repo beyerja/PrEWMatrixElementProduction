@@ -23,7 +23,7 @@ One needs to specify the process and the output base directory.
 ```bash
 cd macros
 chmod u+x run_process.sh
-./run_process.sh --process=[ww_slmuq/ww_sleq/...] --output-base=[...]
+./run_process.sh --process=[ww_sl0muq/...] --output-base=[...]
 ```
 
 This will create simple `.txt` files in a process-specific subdirectory of the given output base. The files contain the results of the `O'Mega` calculation.

@@ -97,7 +97,7 @@ add_condor_job() {
 }
 
 # Binning process dependent (depends on fortran grid file)
-if [[ ${process} == "ww_slmuq" ]]; then
+if [[ ${process} == "ww_sl0muq" ]]; then
   for i in {1..20};
   do
     for j in {1..10};
