@@ -38,6 +38,8 @@ chmod u+x assemble_distributions.sh
 ./assemble_distributions.sh --process=[ww_sl0muq/...] --output-base=[...]
 ```
 
+The fit input distributions are placed in the process subdirectory under `distributions/combined`.
+
 ## Disclaimers
 
 - The current code is specified to use a center-of-mass energy of 250GeV. 
