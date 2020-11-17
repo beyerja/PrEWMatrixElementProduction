@@ -44,7 +44,6 @@ omega_couplings.f90
 omega_spinor_couplings.f90
 omega_utils.f90
 omega95.f90
-ww_sl0eq.f90
 ww_sl0muq.f90
 )
 
