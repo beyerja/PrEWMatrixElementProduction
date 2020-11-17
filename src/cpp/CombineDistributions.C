@@ -1,4 +1,17 @@
-static const std::string output_dir = "/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/WW_charge_separated";
+// -----------------------------------------------------------------------------
+// Brute forcing this a bit, gonna replace these using bash scripts
+static const std::string process = 
+  PROCESS_MARKER
+;
+
+static const std::string output_dir = 
+  OUTPUT_DIR_MARKER
+;
+
+static const int I_n_bins =
+  N_BINS_MARKER
+;
+// -----------------------------------------------------------------------------
 
 void combine_files(
   int energy,
@@ -22,7 +35,6 @@ void combine_files(
     return;
   }
   
-  const int I_n_bins = 2000;
   if ( t_ang->GetEntries() != I_n_bins ) {
     cout << "Number of bins is currently hard coded to 2000 => MUST BE CHANGED IN CODE IF NOT CORRECT!" << endl;
     return;
@@ -174,23 +186,27 @@ void combine_files(
 
 
 void CombineDistributions(){
-
-  combine_files(
-    250, // energy,
-    "WW_semilep_AntiMuNu", // I_process_name, 
-    18781.00 * 0.5 * 0.483, // I_xs_LR, 
-    172.73 * 0.5 * 0.483, // I_xs_RL, 
-    0, // I_xs_LL, 
-    0  // I_xs_RR
-  );
+  /** Combine the distributions for the specified process.
+  **/
   
-  combine_files(
-    250, // energy,
-    "WW_semilep_MuAntiNu", // I_process_name, 
-    18781.00 * 0.5 * 0.483, // I_xs_LR, 
-    172.73 * 0.5 * 0.483, // I_xs_RL, 
-    0, // I_xs_LL, 
-    0  // I_xs_RR
-  );
-  
+  if (process == "ww_sl0muq") {
+    combine_files(
+      250, // energy,
+      "WW_semilep_AntiMuNu", // I_process_name, 
+      18781.00 * 0.5 * 0.483, // I_xs_LR, 
+      172.73 * 0.5 * 0.483, // I_xs_RL, 
+      0, // I_xs_LL, 
+      0  // I_xs_RR
+    );
+    combine_files(
+      250, // energy,
+      "WW_semilep_MuAntiNu", // I_process_name, 
+      18781.00 * 0.5 * 0.483, // I_xs_LR, 
+      172.73 * 0.5 * 0.483, // I_xs_RL, 
+      0, // I_xs_LL, 
+      0  // I_xs_RR
+    );
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
 }

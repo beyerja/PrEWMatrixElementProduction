@@ -1,3 +1,15 @@
+// -----------------------------------------------------------------------------
+// Brute forcing this a bit, gonna replace these using bash scripts
+static const std::string process = 
+  PROCESS_MARKER
+;
+
+static const std::string output_dir = 
+  OUTPUT_DIR_MARKER
+;
+// -----------------------------------------------------------------------------
+
+
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TF1.h"
@@ -36,8 +48,6 @@
 #include <time.h> 
 #include <vector>
 
-using namespace std;
-static const std::string output_dir = "/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/WW_charge_separated";
 const int color_beamer_display[] = {kBlack,kBlue,kRed,kGreen+2,kViolet+1,kOrange+2,kMagenta,kAzure+1,kYellow+1,kCyan+1 };
 double legendposition_header[4] = {0.17,0.93,0.95,0.995};
 
@@ -80,57 +90,65 @@ void GridAsciiToTTree(){
 	const string EnergyCMS = "250GeV";
 	ifstream ifs;
 	
-	vector < string > file_discription;
-	file_discription.push_back("grid_ww_sl0muq_leptonic");
-	file_discription.push_back("grid_ww_sl0muq_hadronic");
-	//file_discription.push_back("grid_ww_sl0eq_leptonic");
-	//file_discription.push_back("grid_ww_sl0eq_hadronic");
-	//file_discription.push_back("grid_sw_sl0qq_minus");
-	//file_discription.push_back("grid_sw_sl0qq_plus");
-	//file_discription.push_back("grid_zz_sl0mu_down");
+	vector < string > file_description;
+  map < string, unsigned int > n_process_variables;
+  map < string, vector < unsigned int > > MAXFileIndicesOfProcesses;
+  
+  if (process == "ww_sl0muq") {
+    file_description.push_back("grid_ww_sl0muq_leptonic");
+    file_description.push_back("grid_ww_sl0muq_hadronic");
+    
+    n_process_variables["grid_ww_sl0muq_leptonic"] = 5;
+    n_process_variables["grid_ww_sl0muq_hadronic"] = 5;
+    
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_leptonic"].push_back(20);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_leptonic"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_leptonic"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_leptonic"].push_back(1);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(20);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(1);
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
+  
+	//file_description.push_back("grid_ww_sl0eq_leptonic");
+	//file_description.push_back("grid_ww_sl0eq_hadronic");
+	//file_description.push_back("grid_sw_sl0qq_minus");
+	//file_description.push_back("grid_sw_sl0qq_plus");
+	//file_description.push_back("grid_zz_sl0mu_down");
 	
-	map < string, unsigned int > numbervariablesOfProcesses;
-	numbervariablesOfProcesses["grid_ww_sl0muq_leptonic"] = 5;
-	numbervariablesOfProcesses["grid_ww_sl0muq_hadronic"] = 5;
-	//numbervariablesOfProcesses["grid_ww_sl0eq_leptonic"] = 5;
-	//numbervariablesOfProcesses["grid_ww_sl0eq_hadronic"] = 5;
-	//numbervariablesOfProcesses["grid_sw_sl0qq_minus"] = 6;
-	//numbervariablesOfProcesses["grid_sw_sl0qq_plus"] = 6;
-	//numbervariablesOfProcesses["grid_zz_sl0mu_down"] = 2;
+	//n_process_variables["grid_ww_sl0eq_leptonic"] = 5;
+	//n_process_variables["grid_ww_sl0eq_hadronic"] = 5;
+	//n_process_variables["grid_sw_sl0qq_minus"] = 6;
+	//n_process_variables["grid_sw_sl0qq_plus"] = 6;
+	//n_process_variables["grid_zz_sl0mu_down"] = 2;
 	
-	map < string, vector < unsigned int > > MAXFileIndicexOfProcesses;
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_leptonic"].push_back(20);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_leptonic"].push_back(10);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_leptonic"].push_back(10);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_leptonic"].push_back(1);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_hadronic"].push_back(20);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
-	MAXFileIndicexOfProcesses["grid_ww_sl0muq_hadronic"].push_back(1);
-	//MAXFileIndicexOfProcesses["grid_ww_sl0eq_leptonic"];
-	//MAXFileIndicexOfProcesses["grid_ww_sl0eq_hadronic"];
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
-	//MAXFileIndicexOfProcesses["grid_zz_sl0mu_down"].push_back(20);
-	//MAXFileIndicexOfProcesses["grid_zz_sl0mu_down"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_zz_sl0mu_down"].push_back(10);
-	//MAXFileIndicexOfProcesses["grid_zz_sl0mu_down"].push_back(1);
+	//MAXFileIndicesOfProcesses["grid_ww_sl0eq_leptonic"];
+	//MAXFileIndicesOfProcesses["grid_ww_sl0eq_hadronic"];
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
+	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(20);
+	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(10);
+	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(1);
 	
 	const string input_path = output_dir + "/grids/";
 	const string output_path = output_dir + "/grids_root/";
 	
 	
-	for(unsigned int n = 0; n < file_discription.size(); n++){
+	for(unsigned int n = 0; n < file_description.size(); n++){
 		
-		const unsigned int numbervariables = numbervariablesOfProcesses[file_discription[n]];
+		const unsigned int numbervariables = n_process_variables[file_description[n]];
 		
-		cout << file_discription[n] << "\t" << numbervariables << endl;
+		cout << file_description[n] << "\t" << numbervariables << endl;
 		time_t start_file_progressing_time = time(0);
 		
 		unsigned int MaxNumberRelements = 0;
@@ -142,7 +160,7 @@ void GridAsciiToTTree(){
 		
 		double total_file_number = 1;
 		for(unsigned int i = 0; i < 4; i++){
-			max_file_number[i] = MAXFileIndicexOfProcesses[file_discription[n]][i];
+			max_file_number[i] = MAXFileIndicesOfProcesses[file_description[n]][i];
 			total_file_number *= (double)max_file_number[i];
 		}
 		
@@ -154,7 +172,7 @@ void GridAsciiToTTree(){
 		for(unsigned int l = 0; l < max_file_number[3]; l++){
 			
 			unsigned int file_index[4] = {i+1,j+1,k+1,l+1};
-			string currentfile = prints("%s%s_%s",input_path.c_str(),file_discription[n].c_str(),EnergyCMS.c_str());
+			string currentfile = prints("%s%s_%s",input_path.c_str(),file_description[n].c_str(),EnergyCMS.c_str());
 			for(unsigned int m = 0; m < 4; m++){
 				if(max_file_number[m]>1){
 					currentfile += prints("_%i",file_index[m]);
@@ -232,7 +250,7 @@ void GridAsciiToTTree(){
 			string SM_elements_description = "SM";
 			string R_elements_description = "R";
 			
-			TFile* outputfile = new TFile( ( output_path + file_discription[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "RECREATE" );
+			TFile* outputfile = new TFile( ( output_path + file_description[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "RECREATE" );
 			TTree* matrix_elements_distribution = new TTree( "MatrixElements", "" );
 			
 			matrix_elements_distribution->Branch(variables_description.c_str(),		variables,		prints("%s[%i]/D",variables_description.c_str(),numbervariables).c_str());
@@ -269,7 +287,7 @@ void GridAsciiToTTree(){
 			string variables_description = "par";
 			string SM_elements_description = "SM";
 			
-			TFile* outputfile = new TFile( ( output_path + file_discription[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "RECREATE" );
+			TFile* outputfile = new TFile( ( output_path + file_description[n] + "_" + EnergyCMS + "_" + TGCdeviation + ".root").c_str() , "RECREATE" );
 			TTree* angular_distribution = new TTree( "MatrixElements", "" );
 			
 			angular_distribution->Branch(variables_description.c_str(),		variables,		prints("%s[%i]/D",variables_description.c_str(),numbervariables).c_str());

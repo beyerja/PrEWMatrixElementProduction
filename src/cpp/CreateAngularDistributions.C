@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// Brute forcing this a bit, gonna replace these using bash scripts
+static const std::string process = 
+  PROCESS_MARKER
+;
+
+static const std::string output_dir = 
+  OUTPUT_DIR_MARKER
+;
+// -----------------------------------------------------------------------------
+
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TF1.h"
@@ -37,7 +48,6 @@
 #include <vector>
 
 using namespace std;
-static const std::string output_dir = "/nfs/dust/ilc/group/ild/beyerjac/TGCAnalysis/SampleProduction/WW_charge_separated";
 const int color_beamer_display[] = {kBlack,kBlue,kRed,kGreen+2,kViolet+1,kOrange+2,kMagenta,kAzure+1,kYellow+1,kCyan+1 };
 const double legendposition_header[4] = {0.17,0.93,0.95,0.995};
 const string path_angular_distributions = output_dir + "/distributions/angular/";
@@ -1090,22 +1100,27 @@ void CreateMultiAngularDistributions( string folder_angle, string folder_PNPC ){
 	string c_name;
 
 	vector < string > file_discription;
-	file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
-	file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+  vector < string > file_discription;
+  vector < vector < double > > scaling(2);
+  if (process == "ww_sl0muq") {
+    file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
+    file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+    scaling[0].push_back(1);
+    scaling[0].push_back(1);
+    scaling[0].push_back(1);
+    scaling[0].push_back(1);
+    scaling[1].push_back(1);
+    scaling[1].push_back(1);
+    scaling[1].push_back(1);
+    scaling[1].push_back(1);
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
 	//file_discription.push_back("../grids/grid_ww_sl0eq_leptonic");
 	//file_discription.push_back("../grids/grid_ww_sl0eq_hadronic");
 	
-	vector < vector < double > > scaling(2);
 	
 	
-	scaling[0].push_back(1);
-	scaling[0].push_back(1);
-	scaling[0].push_back(1);
-	scaling[0].push_back(1);
-	scaling[1].push_back(1);
-	scaling[1].push_back(1);
-	scaling[1].push_back(1);
-	scaling[1].push_back(1);
 	
 	
 	//scaling[0].push_back(0);
@@ -1270,8 +1285,13 @@ void CreateSplitAngularDistributions( string folder_angle, string folder_PNPC ){
 	string c_name;
 
 	vector < string > file_discription;
-	file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
-	file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+  vector < string > file_discription;
+  if (process == "ww_sl0muq") {
+    file_discription.push_back("../grids/grid_ww_sl0muq_leptonic");
+    file_discription.push_back("../grids/grid_ww_sl0muq_hadronic");
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
 	//file_discription.push_back("../grids/grid_ww_sl0eq_leptonic");
 	//file_discription.push_back("../grids/grid_ww_sl0eq_hadronic");
 	
@@ -1461,9 +1481,14 @@ void CreateMultiProcessMultiAngularDistributions( string folder_angle, string fo
 	output_file_descriptions.push_back("WW_semilep_AntiMuNu");
 	
 	vector < vector < string > > input_file_descriptions(2);
-	input_file_descriptions[0].push_back("grid_ww_sl0muq_leptonic");
-	input_file_descriptions[1].push_back("grid_ww_sl0muq_hadronic");
-	
+  vector < string > file_discription;
+  if (process == "ww_sl0muq") {
+    input_file_descriptions[0].push_back("grid_ww_sl0muq_leptonic");
+    input_file_descriptions[1].push_back("grid_ww_sl0muq_hadronic");
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
+  
 	vector < unsigned int > numbervariables;
 	numbervariables.push_back(5);
 	numbervariables.push_back(5);
@@ -1817,8 +1842,12 @@ void plot_angular_distribution(){
 	string c_name;
 
 	vector < string > file_discription;
-	file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_leptonic");
-	file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_hadronic");
+  if (process == "ww_sl0muq") {
+    file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_leptonic");
+    file_discription.push_back(output_dir + "/distributions/grid_ww_sl0muq_hadronic");
+  } else {
+    throw std::invalid_argument("Unknown process " + process);
+  }
 	
 	vector < vector < double > > scaling(4);
 	scaling[0].push_back(0);
