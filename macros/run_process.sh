@@ -109,6 +109,21 @@ if [[ ${process} == "ww_sl0muq" ]]; then
       done
     done
   done
+elif [[ ${process} == "sw_sl0qq" ]]; then
+  for i in {1..20};
+  do
+    for j in {1..10};
+    do      
+      for k in {1..10};
+      do
+        for l in {1..20};
+        do
+          BIN="${i} ${j} ${k} ${l}"
+          add_condor_job
+        done
+      done
+    done
+  done
 else 
   >&2 echo "Process ${process} unknown!"; exit 1
 fi
