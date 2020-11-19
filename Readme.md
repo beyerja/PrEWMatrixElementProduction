@@ -54,8 +54,8 @@ The fit input distributions are placed in the process subdirectory under `distri
 Source of cross sections from Monte Carlo: 
 https://ilcsoft.desy.de/dbd/generated/250/4f_production/cross_list.txt
 
-#### For WW -> mu nubar q qbar
- Factors:
+#### For WW -> mu nubar q qbar (ww_sl0muq)
+Factors:
   - 0.5   -> Separation of mu+ and mu- final states
   - 0.483 -> Removing tau final state (See PDG for W decays to tau and mu)
 
@@ -65,3 +65,17 @@ LR | 18781.00 * 0.5 * 0.483
 RL | 172.73 * 0.5 * 0.483
 LL | 0
 RR | 0
+
+#### For Wenu -> q qbar e nu (sw_sl0qq)
+Factors:
+  - 0.5   -> Separation of e+ and e- final states
+
+**Cross sections with factors:**
+
+chirality | e- | e+
+---|---|---
+LR | 9999.52 * 0.5 | 9999.52 * 0.5
+RL | 85.62 * 0.5 | 85.62 * 0.5
+LL | 0 | 119.68
+RR | 119.29  | 0
+

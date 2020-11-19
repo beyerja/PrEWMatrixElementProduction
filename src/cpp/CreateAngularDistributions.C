@@ -121,7 +121,7 @@ string prints(const char* format, ...){
 }
 
 void read_grid_files(
-vector < vector < double > > &gird_variables,
+vector < vector < double > > &grid_variables,
 vector < vector < double > > &grid_SM_elements,
 vector < vector < vector < double > > > &grid_R_elements,
 const unsigned int numbervariables,
@@ -166,12 +166,12 @@ bool filebased_nomalization = false
 					matrix_elements_distribution->GetEntry(i);
 					
 					if(numbervariables>0){
-						vector < double > current_gird_variables;
+						vector < double > current_grid_variables;
 						for(unsigned int j = 0; j < numbervariables; j++){
-							current_gird_variables.push_back(variables[j]);
+							current_grid_variables.push_back(variables[j]);
 
 						}
-						gird_variables.push_back(current_gird_variables);
+						grid_variables.push_back(current_grid_variables);
 					}
 					
 					if(numberchiralities>0){
@@ -317,14 +317,14 @@ void write_angular_file(
 void write_PNPC_file( 
 	string filename,
 	string TTreeName,
-	vector < vector < vector < double > > > coefficionts,
+	vector < vector < vector < double > > > coefficients,
 	vector < vector < double > > center,
 	vector < vector < double > > width,
 	vector < string > PNPC_description,
 	vector < string > chiral_description
 ){
 	
-	if( coefficionts.size() == center.size() && coefficionts.size() == width.size() ){
+	if( coefficients.size() == center.size() && coefficients.size() == width.size() ){
 		
 		map< string, unsigned int > chiral_assigment;		
 		chiral_assigment["eLpR"] = 0;
@@ -340,10 +340,10 @@ void write_PNPC_file(
 		
 		string coefficiont_label = "";
 		
-		for( unsigned int i = 0; i < coefficionts.size(); i++){
+		for( unsigned int i = 0; i < coefficients.size(); i++){
 			angle_dim = TMath::Max( angle_dim, (int)center[i].size() );
 			angle_dim = TMath::Max( angle_dim, (int)width[i].size() );
-			coefficiont_dim = TMath::Max( coefficiont_dim, (int)coefficionts[i].size() );
+			coefficiont_dim = TMath::Max( coefficiont_dim, (int)coefficients[i].size() );
 		}
 		
 		
@@ -359,7 +359,7 @@ void write_PNPC_file(
 		angular_distribution->Branch("relative_PNPC_LL",	chiral_angular_value[3],	prints("relative_PNPC_LL[%i]/D",coefficiont_dim).c_str() );
 		
 		
-		for(unsigned int i = 0; i < coefficionts.size(); i++){
+		for(unsigned int i = 0; i < coefficients.size(); i++){
 			
 			for( int j = 0; j < angle_dim; j++){
 				angle_center[j] = 0;
@@ -384,9 +384,9 @@ void write_PNPC_file(
 				coefficiont_label += PNPC_description[j] + ";";
 			}
 			
-			for(unsigned int j = 0; j < coefficionts[i].size(); j++){
-				for(unsigned int k = 0; k < coefficionts[i][j].size(); k++){
-					chiral_angular_value[chiral_assigment[chiral_description[k]]][j] = coefficionts[i][j][k];
+			for(unsigned int j = 0; j < coefficients[i].size(); j++){
+				for(unsigned int k = 0; k < coefficients[i][j].size(); k++){
+					chiral_angular_value[chiral_assigment[chiral_description[k]]][j] = coefficients[i][j][k];
 				}
 			}
 			angular_distribution->Fill();
@@ -497,21 +497,21 @@ vector < vector< Hist* > > generate_TGC_coefficients( vector < double > TGC_scal
 }
 
 void GeneratedHistConfigMultiAngularDistribution(
-vector < vector < double > > gird_variables,
-unsigned int variable_index[3],
-unsigned int* Genereated_binning,
-double* Genereated_range_min,
-double* Genereated_range_max
+vector < vector < double > > grid_variables,
+vector<unsigned int> variable_index,
+vector<unsigned int> & Genereated_binning,
+vector<double> & Genereated_range_min,
+vector<double> & Genereated_range_max
 ){
 	vector < vector < double > > bin_centers(3);
 	vector < map < double, bool > > bin_center_used(3);
 	
-	for(unsigned int i = 0; i < gird_variables.size(); i++){
+	for(unsigned int i = 0; i < grid_variables.size(); i++){
 		for(unsigned int j = 0; j < 3; j++){
-			if(variable_index[j] < gird_variables[i].size()){
-				if(!bin_center_used[j][gird_variables[i][variable_index[j]]]){
-					bin_centers[j].push_back(gird_variables[i][variable_index[j]]);
-					bin_center_used[j][gird_variables[i][variable_index[j]]] = true;
+			if(variable_index[j] < grid_variables[i].size()){
+				if(!bin_center_used[j][grid_variables[i][variable_index[j]]]){
+					bin_centers[j].push_back(grid_variables[i][variable_index[j]]);
+					bin_center_used[j][grid_variables[i][variable_index[j]]] = true;
 				}
 			}else{
 				cout << "index" << variable_index[j] << " exseeds vector range!" << endl;
@@ -535,12 +535,12 @@ void CalculateMultiAngularDistribution(
 vector < vector < double > > &Distribution,
 vector < vector < double > > &center,
 vector < vector < double > > &width,
-vector < vector < double > > gird_variables,
+vector < vector < double > > grid_variables,
 vector < vector < double > > grid_SM_elements,
-unsigned int variable_index[3],
-unsigned int binning[3],
-double range_min[3],
-double range_max[3]
+vector<unsigned int> variable_index,
+vector<unsigned int> binning,
+vector<double> range_min,
+vector<double> range_max
 ){
 	
 	Distribution.clear();
@@ -570,9 +570,9 @@ double range_max[3]
 	
 	for(unsigned int i = 0; i < grid_SM_elements.size(); i++){
 		for(unsigned int j = 0; j < grid_SM_elements[i].size(); j++){
-			h_relative_angular_distribution[j]->Fill( gird_variables[i][variable_index[0]], gird_variables[i][variable_index[1]], gird_variables[i][variable_index[2]], grid_SM_elements[i][j]);
-			//h_relative_angular_distribution[j]->Fill(gird_variables[i][variable_index[0]], gird_variables[i][variable_index[1]], gird_variables[i][variable_index[2]]);
-			h_relative_angular_distribution_bin_norm[j]->Fill( gird_variables[i][variable_index[0]], gird_variables[i][variable_index[1]], gird_variables[i][variable_index[2]]);
+			h_relative_angular_distribution[j]->Fill( grid_variables[i][variable_index[0]], grid_variables[i][variable_index[1]], grid_variables[i][variable_index[2]], grid_SM_elements[i][j]);
+			//h_relative_angular_distribution[j]->Fill(grid_variables[i][variable_index[0]], grid_variables[i][variable_index[1]], grid_variables[i][variable_index[2]]);
+			h_relative_angular_distribution_bin_norm[j]->Fill( grid_variables[i][variable_index[0]], grid_variables[i][variable_index[1]], grid_variables[i][variable_index[2]]);
 		}
 		
 	}
@@ -628,22 +628,22 @@ double range_max[3]
 
 
 void CalculateMultiAngularTGCDistribution(
-vector < vector < vector < double > > > &coefficionts,
+vector < vector < vector < double > > > &coefficients,
 vector < vector < double > > &center,
 vector < vector < double > > &width,
 vector < double > TGC_scale,
 vector < string > chiral_label,
 string process_label,
-vector < vector < double > > gird_variables,
+vector < vector < double > > grid_variables,
 vector < vector < double > > grid_SM_elements,
 vector < vector < vector < double > > > grid_R_elements,
-unsigned int variable_index[3],
-unsigned int binning[3],
-double range_min[3],
-double range_max[3]
+vector<unsigned int> variable_index,
+vector<unsigned int> binning,
+vector<double> range_min,
+vector<double> range_max
 ){
 	
-	coefficionts.clear();
+	coefficients.clear();
 	center.clear();
 	width.clear();
 	
@@ -663,14 +663,14 @@ double range_max[3]
 
 	for(unsigned int i = 0; i < grid_SM_elements.size(); i++){
 		for(unsigned int j = 0; j < grid_SM_elements[i].size(); j++){
-			h_angular_distribution[j][0]->Fill( gird_variables[i][variable_index[0]], gird_variables[i][variable_index[1]], gird_variables[i][variable_index[2]], grid_SM_elements[i][j]);
+			h_angular_distribution[j][0]->Fill( grid_variables[i][variable_index[0]], grid_variables[i][variable_index[1]], grid_variables[i][variable_index[2]], grid_SM_elements[i][j]);
 		}
 	}
 
 	for(unsigned int i = 0; i < grid_R_elements.size(); i++){
 		for(unsigned int j = 0; j < grid_R_elements[i].size(); j++){
 			for(unsigned int k = 0; k < grid_R_elements[i][j].size(); k++){
-				h_angular_distribution[k][j+1]->Fill( gird_variables[i][variable_index[0]], gird_variables[i][variable_index[1]], gird_variables[i][variable_index[2]], grid_R_elements[i][j][k]);
+				h_angular_distribution[k][j+1]->Fill( grid_variables[i][variable_index[0]], grid_variables[i][variable_index[1]], grid_variables[i][variable_index[2]], grid_R_elements[i][j][k]);
 			}
 		}
 	}
@@ -713,7 +713,7 @@ double range_max[3]
 			}
 			coefficient_content.push_back(chirality_content);
 		}	
-		coefficionts.push_back(coefficient_content);
+		coefficients.push_back(coefficient_content);
 
 	}	
 	}	
@@ -723,64 +723,90 @@ double range_max[3]
 
 void CreateMultiProcessMultiAngularDistributions(){
 	
+  const string EnergyCMS = "250GeV";
+  const bool Use_Generated_Hist_binning_range = true;
+  string general_File_path = output_dir + "/grids_root/";
+  
 	TCanvas* c;
 	string c_name;
-	string general_File_path = output_dir + "/grids_root/";
 	
-	vector < string > output_file_descriptions;
-	output_file_descriptions.push_back("WW_semilep_MuAntiNu");
-	output_file_descriptions.push_back("WW_semilep_AntiMuNu");
-	
-	vector < vector < string > > input_file_descriptions(2);
-  vector < string > file_description;
+	vector < string > output_file_descriptions {};
+	vector < vector < string > > input_file_descriptions {};
+  vector < string > file_description {};
+  vector < unsigned int > numbervariables {};
+  vector < unsigned int > numberchiralities {};
+  vector < unsigned int > MaxNumberRelements {};
+  vector < string > TGCdeviation {};
+  vector<vector<unsigned int>> variable_index {};
+  vector<vector<unsigned int>> binning {};
+  vector<vector<double>> range_min {};
+  vector<vector<double>> range_max {};
+  
+  
   if (process == "ww_sl0muq") {
-    input_file_descriptions[0].push_back("grid_ww_sl0muq_leptonic");
-    input_file_descriptions[1].push_back("grid_ww_sl0muq_hadronic");
+    output_file_descriptions.push_back("WW_semilep_MuAntiNu");
+    output_file_descriptions.push_back("WW_semilep_AntiMuNu");
+    
+    input_file_descriptions.push_back({"grid_ww_sl0muq_leptonic"});
+    input_file_descriptions.push_back({"grid_ww_sl0muq_hadronic"});
+    
+    numbervariables.push_back(5);
+    numbervariables.push_back(5);
+    
+    numberchiralities.push_back(4);
+    numberchiralities.push_back(4);
+    
+    MaxNumberRelements.push_back(9);
+    MaxNumberRelements.push_back(9);
+    
+    TGCdeviation.push_back("0.0001");
+    TGCdeviation.push_back("0.0001");
+    
+    variable_index.push_back({0,1,2});
+    variable_index.push_back({0,1,2});
+    
+    binning.push_back({20,10,10});
+    binning.push_back({20,10,10});
+    
+    range_min.push_back( { -1+(1./(double)(binning[0][0])), -1+(1./(double)(binning[0][1])), -TMath::Pi() / ( (double)(binning[0][2]) )} );
+    range_min.push_back( { -1+(1./(double)(binning[1][0])), -1+(1./(double)(binning[1][1])), -TMath::Pi() / ( (double)(binning[1][2]) )} );
+        
+    range_max.push_back( { 1+(1./(double)(binning[0][0])), 1+(1./(double)(binning[0][1])), ( 2. * TMath::Pi() ) + range_min[0][2] } );
+    range_max.push_back( { 1+(1./(double)(binning[1][0])), 1+(1./(double)(binning[1][1])), ( 2. * TMath::Pi() ) + range_min[1][2] } );
+    
+  } else if (process == "sw_sl0qq") {
+    output_file_descriptions.push_back("sW_semilep_eMinus");
+    output_file_descriptions.push_back("sW_semilep_ePlus");
+    
+    input_file_descriptions.push_back({"grid_sw_sl0qq_plus"});
+    input_file_descriptions.push_back({"grid_sw_sl0qq_minus"});
+    
+    numbervariables.push_back(6);
+    numbervariables.push_back(6);
+
+    numberchiralities.push_back(4);
+    numberchiralities.push_back(4);
+    
+    MaxNumberRelements.push_back(9);
+    MaxNumberRelements.push_back(9);
+    
+    TGCdeviation.push_back("0.0001");
+    TGCdeviation.push_back("0.0001");
+    
+    variable_index.push_back({0,1,3}); // Indices: cosThetaW, cosThetae, Menu
+    variable_index.push_back({0,1,3}); // Indices: cosThetaW, cosThetae, Menu
+    
+    binning.push_back({20,10,20});
+    binning.push_back({20,10,20});
+    
+    range_min.push_back( { -1+(1./(double)(binning[0][0])), -1+(1./(double)(binning[0][1])), 0.0 )} );
+    range_min.push_back( { -1+(1./(double)(binning[1][0])), -1+(1./(double)(binning[1][1])), 0.0 )} );
+        
+    range_max.push_back( { 1+(1./(double)(binning[0][0])), 1+(1./(double)(binning[0][1])), 250.-80.41 } ); // 80.41 = mW in O'Mega, 250 = COM energy
+    range_max.push_back( { 1+(1./(double)(binning[1][0])), 1+(1./(double)(binning[1][1])), 250.-80.41 } ); // 80.41 = mW in O'Mega, 250 = COM energy
   } else {
     throw std::invalid_argument("Unknown process " + process);
   }
-  
-	vector < unsigned int > numbervariables;
-	numbervariables.push_back(5);
-	numbervariables.push_back(5);
-	
-	vector < unsigned int > numberchiralities;
-	numberchiralities.push_back(4);
-	numberchiralities.push_back(4);
-	
-	vector < unsigned int > MaxNumberRelements;
-	MaxNumberRelements.push_back(9);
-	MaxNumberRelements.push_back(9);
-	
-	vector < string > TGCdeviation;
-	TGCdeviation.push_back("0.0001");
-	TGCdeviation.push_back("0.0001");
-	
-	const string EnergyCMS = "250GeV";
-	
-	const unsigned int number_angular_distributions = 3;
-	const unsigned int number_procesess = 2;
-	const bool Use_Generated_Hist_binning_range = true;
-	
-	unsigned int variable_index[number_procesess][number_angular_distributions] = {
-		{0,1,2},
-		{0,1,2}
-	};
-	
-	unsigned int binning[number_procesess][number_angular_distributions] = {
-		{20,10,10},
-		{20,10,10}
-	};
-	
-	double range_min[number_procesess][number_angular_distributions] = {
-		{ -1+(1./(double)(binning[0][0])), -1+(1./(double)(binning[0][1])), -TMath::Pi() / ( (double)(binning[0][2]) )},
-		{ -1+(1./(double)(binning[1][0])), -1+(1./(double)(binning[1][1])), -TMath::Pi() / ( (double)(binning[1][2]) )}
-	};
-	
-	double range_max[number_procesess][number_angular_distributions] = {
-		{ 1+(1./(double)(binning[0][0])), 1+(1./(double)(binning[0][1])), ( 2. * TMath::Pi() ) + range_min[0][2] },
-		{ 1+(1./(double)(binning[1][0])), 1+(1./(double)(binning[1][1])), ( 2. * TMath::Pi() ) + range_min[1][2] }
-	};
 	
 	
 	if(output_file_descriptions.size() == input_file_descriptions.size()){
@@ -793,7 +819,7 @@ void CreateMultiProcessMultiAngularDistributions(){
 			chiral_label.push_back("eRpL");
 			chiral_label.push_back("eRpR");	
 			
-			vector < vector < double > > gird_variables;
+			vector < vector < double > > grid_variables;
 			vector < vector < double > > grid_SM_elements;
 			vector < vector < vector < double > > > grid_R_elements;
 			vector < vector < double > > Distribution;
@@ -812,13 +838,13 @@ void CreateMultiProcessMultiAngularDistributions(){
 				current_file_names.push_back( general_File_path + input_file_descriptions[i][j] );
 			}
 			
-			read_grid_files(gird_variables, grid_SM_elements, grid_R_elements, numbervariables[i], numberchiralities[i], MaxNumberRelements[i], current_file_names, scaling, EnergyCMS, TGCdeviation[i], true );				
+			read_grid_files(grid_variables, grid_SM_elements, grid_R_elements, numbervariables[i], numberchiralities[i], MaxNumberRelements[i], current_file_names, scaling, EnergyCMS, TGCdeviation[i], true );				
 			
-			unsigned int Genereated_binning[] = {0,0,0};
-			double Genereated_range_min[] = {0,0,0};
-			double Genereated_range_max[] = {0,0,0};
+			vector<unsigned int> Genereated_binning {0,0,0};
+			vector<double> Genereated_range_min {0,0,0};
+			vector<double> Genereated_range_max {0,0,0};
 			
-			GeneratedHistConfigMultiAngularDistribution(gird_variables,variable_index[i],Genereated_binning,Genereated_range_min,Genereated_range_max);
+			GeneratedHistConfigMultiAngularDistribution(grid_variables,variable_index[i],Genereated_binning,Genereated_range_min,Genereated_range_max);
 			cout << "Created Hist Init:" << endl; 
 			for(unsigned int i = 0; i < 3; i++){
 				cout << Genereated_binning[i] << "\t";
@@ -938,9 +964,9 @@ void CreateMultiProcessMultiAngularDistributions(){
 			c->SaveAs( (path_plots + c_name + ".pdf").c_str() );
 			
 			if(Use_Generated_Hist_binning_range){
-				CalculateMultiAngularDistribution(Distribution,center,width,gird_variables,grid_SM_elements,variable_index[i],Genereated_binning,Genereated_range_min,Genereated_range_max);
+				CalculateMultiAngularDistribution(Distribution,center,width,grid_variables,grid_SM_elements,variable_index[i],Genereated_binning,Genereated_range_min,Genereated_range_max);
 			}else{
-				CalculateMultiAngularDistribution(Distribution,center,width,gird_variables,grid_SM_elements,variable_index[i],binning[i],range_min[i],range_max[i]);
+				CalculateMultiAngularDistribution(Distribution,center,width,grid_variables,grid_SM_elements,variable_index[i],binning[i],range_min[i],range_max[i]);
 			}
 			unsigned int size_min = center[0].size();
 			unsigned int size_max = center[0].size();
@@ -1056,19 +1082,19 @@ void CreateMultiProcessMultiAngularDistributions(){
 						
 			if(MaxNumberRelements[i]>0){
 				vector < double > TGC_scale;
-				vector < vector < vector < double > > > coefficionts;
+				vector < vector < vector < double > > > coefficients;
 				for(unsigned int j = 0; j < numberchiralities[i]; j++){
 					TGC_scale.push_back( stod( TGCdeviation[i] ) ); 
 				}
 				
 				if(Use_Generated_Hist_binning_range){
 					CalculateMultiAngularTGCDistribution(
-						coefficionts,center,width,TGC_scale,chiral_label,output_file_descriptions[i],gird_variables,grid_SM_elements,grid_R_elements,
+						coefficients,center,width,TGC_scale,chiral_label,output_file_descriptions[i],grid_variables,grid_SM_elements,grid_R_elements,
 						variable_index[i],Genereated_binning,Genereated_range_min,Genereated_range_max
 					);
 				}else{
 					CalculateMultiAngularTGCDistribution(
-						coefficionts,center,width,TGC_scale,chiral_label,output_file_descriptions[i],gird_variables,grid_SM_elements,grid_R_elements,variable_index[i],binning[i],range_min[i],range_max[i]
+						coefficients,center,width,TGC_scale,chiral_label,output_file_descriptions[i],grid_variables,grid_SM_elements,grid_R_elements,variable_index[i],binning[i],range_min[i],range_max[i]
 					);
 				}
 				string coefficient_labeling[] = {"A","B","C","D","E","F","G","H","I"};
@@ -1078,7 +1104,7 @@ void CreateMultiProcessMultiAngularDistributions(){
 				}
 				
 				write_PNPC_file( ( path_PNPC_distributions + "AngularTGCDistribution_" + EnergyCMS + "_" + output_file_descriptions[i] + ".root" ),
-					"AngularDistribution",coefficionts,center,width,PNPC_description,chiral_label);
+					"AngularDistribution",coefficients,center,width,PNPC_description,chiral_label);
 			}
 			
 		}

@@ -189,6 +189,7 @@ void CombineDistributions(){
   /** Combine the distributions for the specified process.
   **/
   
+  // For some comments on the scaling factors see the global Readme
   if (process == "ww_sl0muq") {
     combine_files(
       250, // energy,
@@ -204,6 +205,23 @@ void CombineDistributions(){
       18781.00 * 0.5 * 0.483, // I_xs_LR, 
       172.73 * 0.5 * 0.483, // I_xs_RL, 
       0, // I_xs_LL, 
+      0  // I_xs_RR
+    );
+  } else if (process == "sw_sl0qq") {
+    combine_files(
+      250, // energy,
+      "sW_semilep_eMinus", // I_process_name, 
+      9999.52 * 0.5, // I_xs_LR, 
+      85.62 * 0.5, // I_xs_RL, 
+      0, // I_xs_LL, 
+      119.29  // I_xs_RR
+    );
+    combine_files(
+      250, // energy,
+      "sW_semilep_ePlus", // I_process_name, 
+      9999.52 * 0.5, // I_xs_LR, 
+      85.62 * 0.5, // I_xs_RL, 
+      119.68, // I_xs_LL, 
       0  // I_xs_RR
     );
   } else {

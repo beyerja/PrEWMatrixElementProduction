@@ -109,32 +109,35 @@ void GridAsciiToTTree(){
     MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
     MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(10);
     MAXFileIndicesOfProcesses["grid_ww_sl0muq_hadronic"].push_back(1);
+  } else if (process == "sw_sl0qq") {
+    file_description.push_back("grid_sw_sl0qq_minus");
+    file_description.push_back("grid_sw_sl0qq_plus");
+    
+    n_process_variables["grid_sw_sl0qq_minus"] = 6;
+    n_process_variables["grid_sw_sl0qq_plus"] = 6;
+    
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
+    MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
   } else {
     throw std::invalid_argument("Unknown process " + process);
   }
   
 	//file_description.push_back("grid_ww_sl0eq_leptonic");
 	//file_description.push_back("grid_ww_sl0eq_hadronic");
-	//file_description.push_back("grid_sw_sl0qq_minus");
-	//file_description.push_back("grid_sw_sl0qq_plus");
 	//file_description.push_back("grid_zz_sl0mu_down");
 	
 	//n_process_variables["grid_ww_sl0eq_leptonic"] = 5;
 	//n_process_variables["grid_ww_sl0eq_hadronic"] = 5;
-	//n_process_variables["grid_sw_sl0qq_minus"] = 6;
-	//n_process_variables["grid_sw_sl0qq_plus"] = 6;
 	//n_process_variables["grid_zz_sl0mu_down"] = 2;
 	
 	//MAXFileIndicesOfProcesses["grid_ww_sl0eq_leptonic"];
 	//MAXFileIndicesOfProcesses["grid_ww_sl0eq_hadronic"];
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
-	//MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
 	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(20);
 	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(10);
 	//MAXFileIndicesOfProcesses["grid_zz_sl0mu_down"].push_back(10);
