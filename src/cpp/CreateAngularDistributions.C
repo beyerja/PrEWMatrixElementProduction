@@ -799,8 +799,8 @@ void CreateMultiProcessMultiAngularDistributions(){
     binning.push_back({20,10,20});
     binning.push_back({20,10,20});
     
-    range_min.push_back( { -1+(1./(double)(binning[0][0])), -1+(1./(double)(binning[0][1])), 0.0 )} );
-    range_min.push_back( { -1+(1./(double)(binning[1][0])), -1+(1./(double)(binning[1][1])), 0.0 )} );
+    range_min.push_back( { -1+(1./(double)(binning[0][0])), -1+(1./(double)(binning[0][1])), 0.0 } );
+    range_min.push_back( { -1+(1./(double)(binning[1][0])), -1+(1./(double)(binning[1][1])), 0.0 } );
         
     range_max.push_back( { 1+(1./(double)(binning[0][0])), 1+(1./(double)(binning[0][1])), 250.-80.41 } ); // 80.41 = mW in O'Mega, 250 = COM energy
     range_max.push_back( { 1+(1./(double)(binning[1][0])), 1+(1./(double)(binning[1][1])), 250.-80.41 } ); // 80.41 = mW in O'Mega, 250 = COM energy
