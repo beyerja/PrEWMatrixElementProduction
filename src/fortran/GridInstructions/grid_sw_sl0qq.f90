@@ -71,7 +71,7 @@ character(len=12), dimension(:), allocatable :: args
 character(len=1024), dimension(2) :: filename
 character(len=16) :: energylabel
 
-ECMS = 500._omega_prec
+ECMS = 250._omega_prec
 write(energylabel, *) int(ECMS)
 
 TGCdev = 0.0001_8
