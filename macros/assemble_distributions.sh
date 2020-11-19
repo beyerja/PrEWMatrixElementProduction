@@ -122,6 +122,8 @@ do
   token=N_BINS_MARKER # Number of bins is process dependent!
   if [[ ${process} == "ww_sl0muq" ]]; then
     replacement=2000
+  elif [[ ${process} == "sw_sl0qq" ]]; then
+    replacement=4000
   else 
     >&2 echo "Process ${process} unknown!"; exit 1
   fi
