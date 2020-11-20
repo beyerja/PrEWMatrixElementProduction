@@ -157,29 +157,31 @@ void GridAsciiToTTree(){
 		vector < vector < double > > grid_SM_elements;
 		vector < vector < vector < double > > > grid_R_elements;
 		
-		unsigned int max_file_number[4];
+		vector<unsigned int> max_file_number;
 		
 		double total_file_number = 1;
-		for(unsigned int i = 0; i < 4; i++){
-			max_file_number[i] = MAXFileIndicesOfProcesses[file_description[n]][i];
-			total_file_number *= (double)max_file_number[i];
-		}
-		
+    for (auto max_index: MAXFileIndicesOfProcesses[file_description[n]]) {
+      max_file_number.push_back(max_index);
+      total_file_number *= (double)max_index;
+    }
+	
 		double total_file_count = 0;
-		
+    
+    // Allowing up to four file indices (Really, really sorry about this code...)
+    string currentfile_base = prints("%s%s_%s",input_path.c_str(),file_description[n].c_str(),EnergyCMS.c_str());
 		for(unsigned int i = 0; i < max_file_number[0]; i++){
-		for(unsigned int j = 0; j < max_file_number[1]; j++){
-		for(unsigned int k = 0; k < max_file_number[2]; k++){
-		for(unsigned int l = 0; l < max_file_number[3]; l++){
-			
-			unsigned int file_index[4] = {i+1,j+1,k+1,l+1};
-			string currentfile = prints("%s%s_%s",input_path.c_str(),file_description[n].c_str(),EnergyCMS.c_str());
-			for(unsigned int m = 0; m < 4; m++){
-				if(max_file_number[m]>1){
-					currentfile += prints("_%i",file_index[m]);
-				}
-			}
-			currentfile += ".txt";
+    string i_str = prints("_%i",i+1);
+    unsigned int j_max = (max_file_number.size() > 1) ? max_file_number[1] : 1;
+		for(unsigned int j = 0; j < j_max; j++){
+    string j_str = (max_file_number.size() > 1) ? prints("_%i",j+1) : "";
+    unsigned int k_max = (max_file_number.size() > 2) ? max_file_number[2] : 1;
+		for(unsigned int k = 0; k < k_max; k++){
+    string k_str = (max_file_number.size() > 2) ? prints("_%i",k+1) : "";
+    unsigned int l_max = (max_file_number.size() > 3) ? max_file_number[3] : 1;
+		for(unsigned int l = 0; l < l_max; l++){
+      string l_str = (max_file_number.size() > 3) ? prints("_%i",l+1) : "";
+      // Determine the name of current file
+			string currentfile = currentfile_base + i_str + j_str + k_str + l_str + ".txt";
 			
 			if( (int)(total_file_count)%(int)(0.05*total_file_number) == 0 ){
 				cout << 100 * total_file_count / total_file_number << "% of the files done after " << time(0) - start_file_progressing_time << "s" << endl;
