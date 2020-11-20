@@ -118,10 +118,8 @@ void GridAsciiToTTree(){
     
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
-    MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
-    MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(10);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_plus"].push_back(20);
   } else {

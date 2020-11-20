@@ -98,11 +98,11 @@ add_condor_job() {
 
 # Binning process dependent (depends on fortran grid file)
 if [[ ${process} == "ww_sl0muq" ]]; then
-  for i in {1..20};
+  for i in {1..20}; # cos(theta_W-)
   do
-    for j in {1..10};
+    for j in {1..10}; # cos(theta_l)
     do	
-      for k in {1..10};
+      for k in {1..10}; # phi_l
       do
         BIN="${i} ${j} ${k}"
         add_condor_job
@@ -110,17 +110,14 @@ if [[ ${process} == "ww_sl0muq" ]]; then
     done
   done
 elif [[ ${process} == "sw_sl0qq" ]]; then
-  for i in {1..20};
+  for i in {1..20}; # cos(theta_W)
   do
-    for j in {1..10};
+    for j in {1..10}; # cos(theta_e)
     do      
-      for k in {1..10};
+      for k in {1..20}; # m_enu
       do
-        for l in {1..20};
-        do
-          BIN="${i} ${j} ${k} ${l}"
-          add_condor_job
-        done
+        BIN="${i} ${j} ${k}"
+        add_condor_job
       done
     done
   done

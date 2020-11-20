@@ -66,7 +66,7 @@ real(kind=omega_prec), dimension(10) :: anomalousg, anomalousk, anomalousl
 real(kind=omega_prec), dimension(4) :: rho_in
 real(kind=omega_prec), dimension(16,4,4) :: rho_out
 real(kind=omega_prec) :: costh_min, costh_max, costh_width, costh_center
-real(kind=omega_prec) :: costhq_min, costhq_max, costhq_width, costhq_center
+real(kind=omega_prec) :: costhq_min, costhq_max
 real(kind=omega_prec) :: costhl_min, costhl_max, costhl_width, costhl_center
 real(kind=omega_prec) :: costh, ph, costhq, phq, costhl, phl, mW, Wrange, E, Ee, menu, ECMS, tempG, tempH
 real(kind=omega_prec) :: cosalpha,  currentWmomentum, currentjetmomentum, currentemomentum, TGCdev, cw
@@ -156,9 +156,6 @@ open(30,file=trim(filename(1)),iostat=filestat(1))
 open(31,file=trim(filename(2) ),iostat=filestat(2) )
 if(filestat(1)==0 .AND. filestat(2)==0) then
 
-	!th = ( PI / dble(th_steps) ) * A(1)
-	!thl = ( PI / dble(thl_steps) ) * A(2)
-	!thq = ( PI / dble(thq_steps) ) *  A(3)
 	costh_min =  -1_omega_prec + ( 1.5_omega_prec / dble(costh_steps-1) )
 	costhl_min = -1_omega_prec + ( 1.5_omega_prec / dble(costhl_steps-1) )
 	costhq_min = -1_omega_prec + ( 1.5_omega_prec / dble(costhq_steps-1) )
@@ -167,21 +164,21 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 	costhq_max = 1_omega_prec - ( 1.5_omega_prec / dble(costhq_steps-1) )
 	costh_width = ( costh_max - costh_min) / dble(costh_steps-1)
 	costhl_width = ( costhl_max - costhl_min) / dble(costhl_steps-1)
-	costhq_width = ( costhq_max - costhq_min) / dble(costhq_steps-1)
 	costh_center =  costh_width * dble(A(1)-1) + costh_min
 	costhl_center = costhl_width * dble(A(2)-1) + costhl_min
-	costhq_center = costhq_width * dble(A(3)-1) + costhq_min
-	!iEe = A(4)
-	imenu = A(4)
+	imenu = A(3)
 	
+  do icosthq=1,costhq_steps
+    !thq = ( PI / dble(thq_steps) ) * dble( ithq )
+    costhq = ( 2_omega_prec / dble(costhq_steps) ) * dble( icosthq ) - 1_omega_prec
 	do iphq=1,phq_steps
 		phq = ( 2_omega_prec * PI / dble(phq_steps+1) ) * dble( iphq )
 		!directionq(1) = sin(thq)*cos(phq)
 		!directionq(2) = sin(thq)*sin(phq)
 		!directionq(3) = cos(thq)
-		directionq(1) = sqrt(1 - costhq_center**2)*cos(phq)
-		directionq(2) = sqrt(1 - costhq_center**2)*sin(phq)
-		directionq(3) = costhq_center
+		directionq(1) = sqrt(1 - costhq**2)*cos(phq)
+		directionq(2) = sqrt(1 - costhq**2)*sin(phq)
+		directionq(3) = costhq
 	!do iEe=1,Ee_steps
 	do iphl=1,phl_steps
 		phl = ( 2_omega_prec * PI / dble(phl_steps+1) ) * dble( iphl )
@@ -217,57 +214,6 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			directionW(1) = sqrt(1 - costh**2)*cos(ph)
 			directionW(2) = sqrt(1 - costh**2)*sin(ph)
 			directionW(3) = costh
-			
-			
-			!Here start old calculation of lepton polar angle in the lab frame
-			
-			!p4(0) = ( mW + ( ( mass(1)**2 - mass(2)**2 ) / mW ) )  / 2_omega_prec
-			!currentjetmomentum = sqrt( p4(0)**2 - mass(1)**2 )
-			!p4(1:3) = currentjetmomentum * directionq(1:3)
-					
-			!p3(0) = mW - p4(0)
-			!p3(1:3) = -p4(1:3)
-			
-			!E = p(0,1) + p(0,2)
-			!Ee = ( 0.5_omega_prec * ( E - mW ) / dble(Ee_steps+1) ) * dble( iEe )
-			!currentemomentum = sqrt( Ee**2 - mass(11)**2 )
-			!p5(0) = Ee
-			!p5(1:3) = currentemomentum * directionl(1:3)
-						
-			!Vc = ( 0.5_omega_prec * ( E**2 + mW**2 + mass(11)**2 - mass(12)**2 ) ) - ( E*Ee )
-			!Vb = E - Ee
-			!Va = currentemomentum * (directionW(1)*directionl(1) + directionW(2)*directionl(2) + directionW(3)*directionl(3))
-			
-			!momentumW(0) = (Vc*Vb - sqrt( Va**2*Vc**2 + (mW**2*Va**2*(Va**2-Vb**2)) ) ) / (Vb**2-Va**2)
-			!currentWmomentum = sqrt(momentumW(0)**2 - mW**2)
-			!momentumW(1:3) =  currentWmomentum * directionW(1:3)
-			
-			!p6(0:3) = p(0:3,1) + p(0:3,2) - momentumW(0:3) - p5(0:3)
-			
-			!write(30,*) "W:", momentumW(0:3)
-			!write(30,*) "e:", p5(0:3)
-			!write(30,*) "nu:", p6(0:3)
-			!write(30,*) momentumW(0:3)+p5(0:3)+p6(0:3)
-			!write(30,*) sqrt(p5(0)**2 - p5(1)**2 - p5(2)**2 - p5(3)**2), &
-			!sqrt(abs(p6(0)**2 - p6(1)**2 - p6(2)**2 - p6(3)**2)), & 
-			!sqrt(momentumW(0)**2 - momentumW(1)**2 - momentumW(2)**2 - momentumW(3)**2)
-			
-			!write(30,*) p6(0)**2, (p6(1)**2 + p6(2)**2 + p6(3)**2)
-				
-			!write(30,*) " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "
-			
-			!Wboost(0) = momentumW(0)
-			!Wboost(1:3) = -momentumW(1:3)
-			
-			!p(0:3,5) = p5(0:3)
-			!p(0:3,6) = p6(0:3)		
-			
-			!call lorentzBOOST(Wboost, p3, p(0:3,3) )
-			!call lorentzBOOST(Wboost, p4, p(0:3,4) )
-			
-			!do j=1,6
-			!	write(30,*) p(0:3,j)
-			!end do
       
       ! Calculate the W and enu momenta
       momentumW(0) = ( E + ( ( mW**2 - menu**2 ) / E ) )  / 2_omega_prec
@@ -336,16 +282,17 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 				 end do
 			end do
 			
-		!write(30,*) costh, costhl, phl, menu, costhq_center, phq, MatrixElement(1,1:40)
-		!write(31,*) costh, costhl, phl, menu, costhq_center, phq, MatrixElement(2,1:40)
+		!write(30,*) costh, costhl, phl, menu, costhq, phq, MatrixElement(1,1:40)
+		!write(31,*) costh, costhl, phl, menu, costhq, phq, MatrixElement(2,1:40)
 		
 		end do
 		end do	 
 		end do
 		end do
+  end do
 		
-		write(30,*) costh_center, costhl_center, phl, menu, costhq_center, phq, MatrixElement(1,1:40)
-		write(31,*) costh_center, costhl_center, phl, menu, costhq_center, phq, MatrixElement(2,1:40)	
+		write(30,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(1,1:40)
+		write(31,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(2,1:40)	
 		
 	end do
 	!end do
