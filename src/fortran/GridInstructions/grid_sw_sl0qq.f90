@@ -34,6 +34,7 @@ use omega_kinds
 use omega_parameters
 use omega95
 use MathOperations
+use Rotation
 use sw_sl0qq
 
 implicit none
@@ -54,6 +55,9 @@ real(kind=omega_prec), dimension(2,40) :: MatrixElement
 real(kind=omega_prec), dimension(0:3) :: p1,p2,p3,p4,p5,p6
 real(kind=omega_prec), dimension(0:3) :: Wboost, menuboost, momentumW
 real(kind=omega_prec), dimension(3) :: directionW,directionl,directionq
+real(kind=omega_prec), dimension(3) :: p_W, p_enu, p_em
+real(kind=omega_prec), dimension(3) :: p_f_W_rot, p_f_enu_rot
+real(kind=omega_prec), dimension (3,3) :: W_rotation, enu_rotation
 real(kind=omega_prec), dimension(10) :: A
 real(kind=omega_prec), dimension(8) :: TGCpar
 real(kind=omega_prec), dimension(10) :: anomalousg, anomalousk, anomalousl
@@ -125,7 +129,10 @@ polarization(1:4,2) = [ 0._omega_prec, 1._omega_prec, 0._omega_prec, 0._omega_pr
 polarization(1:4,3) = [ 0._omega_prec, 0._omega_prec, 1._omega_prec, 0._omega_prec ]
 polarization(1:4,4) = [ 0._omega_prec, 0._omega_prec, 0._omega_prec, 1._omega_prec ]
 
-p(0:3,1) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec,  0.5_omega_prec * ECMS]
+! incoming e-
+p(0:3,1) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec,  0.5_omega_prec * ECMS] 
+p_em = p(1:3,1)
+! incoming e+
 p(0:3,2) = [ 0.5_omega_prec * ECMS, 0._omega_prec, 0._omega_prec, -0.5_omega_prec * ECMS]
 
 !th_steps = 20
@@ -261,13 +268,30 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			!do j=1,6
 			!	write(30,*) p(0:3,j)
 			!end do
+      
+      ! Calculate the W and enu momenta
+      momentumW(0) = ( E + ( ( mW**2 - menu**2 ) / E ) )  / 2_omega_prec
+      currentWmomentum = sqrt(momentumW(0)**2 - mW**2)
+      p_W = currentWmomentum * directionW(1:3)
+      p_enu = - p_W
+      momentumW(1:3) = p_W
+      
+      Wboost(0) = momentumW(0)
+      Wboost(1:3) = -momentumW(1:3)
+      
+      menuboost(0) = E - momentumW(0)
+      menuboost(1:3) = momentumW(1:3)
+      
+      ! Rotation matrices to rotate out of the W/enu rest frame coordinates in which W/enu flight is z axis
+      W_rotation = rotate_out_of(p_em,p_W)
+      enu_rotation = rotate_out_of(p_em,p_enu)
 			
 			!Here the new calculation of the lepton angle in the invariant mass system with the neutrino
-			
-			
 			p4(0) = ( mW + ( ( mass(1)**2 - mass(2)**2 ) / mW ) )  / 2_omega_prec
 			currentjetmomentum = sqrt( p4(0)**2 - mass(1)**2 )
-			p4(1:3) = currentjetmomentum * directionq(1:3)
+      p_f_W_rot = currentjetmomentum * directionq(1:3)
+      p_f_W_rot = matmul(W_rotation, p_f_W_rot)
+			p4(1:3) = p_f_W_rot
 					
 			p3(0) = mW - p4(0)
 			p3(1:3) = -p4(1:3)
@@ -276,21 +300,14 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 			
 			p5(0) = ( menu + ( ( mass(11)**2 - mass(12)**2 ) / menu ) )  / 2_omega_prec
 			currentemomentum = sqrt( p5(0)**2 - mass(11)**2 )
-			p5(1:3) = currentemomentum * directionl(1:3)
+      p_f_enu_rot = currentemomentum * directionl(1:3)
+      p_f_enu_rot = matmul(enu_rotation, p_f_enu_rot)
+			p5(1:3) = p_f_enu_rot
 					
 			p6(0) = menu - p5(0)
 			p6(1:3) = -p5(1:3)
-			
-			momentumW(0) = ( E + ( ( mW**2 - menu**2 ) / E ) )  / 2_omega_prec
-			currentWmomentum = sqrt(momentumW(0)**2 - mW**2)
-			momentumW(1:3) =  currentWmomentum * directionW(1:3)
-			
-			Wboost(0) = momentumW(0)
-			Wboost(1:3) = -momentumW(1:3)
-			
-			menuboost(0) = E - momentumW(0)
-			menuboost(1:3) = momentumW(1:3)
-			
+
+			! Boost the leptons out of the W/enu system into the lab frame
 			call lorentzBOOST(Wboost, p3, p(0:3,3) )
 			call lorentzBOOST(Wboost, p4, p(0:3,4) )
 			call lorentzBOOST(menuboost, p5, p(0:3,5) )
