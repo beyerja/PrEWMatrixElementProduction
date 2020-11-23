@@ -290,13 +290,13 @@ if(filestat(1)==0 .AND. filestat(2)==0) then
 		end do
 		end do
   end do
-		
-		write(30,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(1,1:40)
-		write(31,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(2,1:40)	
-		
-	end do
-	!end do
-	end do
+  end do
+  !end do
+  end do
+  
+  
+  write(30,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(1,1:40)
+  write(31,*) costh_center, costhl_center, phl, menu, costhq, phq, MatrixElement(2,1:40)	
 else
 	write(*,*) "File not opened: Terminating"
 end if
