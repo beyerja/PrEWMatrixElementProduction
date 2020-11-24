@@ -5,6 +5,32 @@
 
 
 # ---------------------------------------------------------------------------- #
+# Input parameters to be defined
+use_optimisation=true
+
+# ------------------------------------------------------------------------------
+# Read input
+for i in "$@"
+do
+case $i in
+  --no-opt)
+    use_optimisation=false
+    shift # past argument=value
+  ;;
+  -h|--help)
+    echo "usage: ./create_executables.sh [--no-opt]"
+    echo "Arguments:"
+    echo "  --no-opt : Don't perform any gfortran compiler optimisation."
+    shift # past argument=value
+  ;;
+  *)
+    # unknown option
+    shift
+  ;;
+esac
+done
+
+# ---------------------------------------------------------------------------- #
 # Establish the important directories
 
 # Path to this current script
@@ -59,12 +85,19 @@ Rotation.f90
 # ---------------------------------------------------------------------------- #
 # Compile all needed base source files into libraries 
 
+# Which compiler flags should be used?
+flags="-O2"
+if [ "$use_optimisation" = false ]; then
+  echo "Will not optimise using gfortran (use this only for debugging)."
+  flags=""
+fi
+
 echo "Start compiling O'Mega."
 cd ${lib_dir}
 for omega_file in ${omega_files[@]};
 do
   echo "Compiling into library: ${omega_file}"
-  gfortran -c ${omega_dir}/${omega_file}
+  gfortran -c ${flags} ${omega_dir}/${omega_file}
 done
 echo "Done compiling O'Mega."
 
@@ -73,7 +106,7 @@ cd ${lib_dir}
 for helper_file in ${helper_files[@]};
 do
   echo "Compiling into library: ${helper_file}"
-  gfortran -c ${helper_dir}/${helper_file}
+  gfortran -c ${flags} ${helper_dir}/${helper_file}
 done
 echo "Done compiling Helpers."
 
@@ -81,7 +114,7 @@ echo "Start compiling the processes."
 for process_file in ${process_files[@]};
 do
   echo "Compiling into binary: ${process_file}"
-  gfortran -c ${process_dir}/${process_file}
+  gfortran -c ${flags} ${process_dir}/${process_file}
 done
 echo "Done compiling processes."
 
@@ -99,7 +132,7 @@ for grid_file in ${grid_files[@]};
 do
   echo "Compiling into binary: ${grid_file}"
   output_name_base=$(basename --suffix=.f90 ${grid_file})
-  gfortran ${grid_file} -J${lib_dir} -I${lib_dir} -L${lib_dir} -lomega -o "${output_name_base}.bin"
+  gfortran ${grid_file} ${flags} -J${lib_dir} -I${lib_dir} -L${lib_dir} -lomega -o "${output_name_base}.bin"
 done
 echo "Done compiling grid instructions."
 
