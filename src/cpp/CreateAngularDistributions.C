@@ -781,8 +781,8 @@ void CreateMultiProcessMultiAngularDistributions(){
     input_file_descriptions.push_back({"grid_sw_sl0qq_plus"});
     input_file_descriptions.push_back({"grid_sw_sl0qq_minus"});
     
-    numbervariables.push_back(6);
-    numbervariables.push_back(6);
+    numbervariables.push_back(3);
+    numbervariables.push_back(3);
 
     numberchiralities.push_back(4);
     numberchiralities.push_back(4);
@@ -793,8 +793,8 @@ void CreateMultiProcessMultiAngularDistributions(){
     TGCdeviation.push_back("0.0001");
     TGCdeviation.push_back("0.0001");
     
-    variable_index.push_back({0,1,3}); // Indices: cosThetaW, cosThetae, Menu
-    variable_index.push_back({0,1,3}); // Indices: cosThetaW, cosThetae, Menu
+    variable_index.push_back({0,1,2}); // Indices: cosThetaW, cosThetae, Menu
+    variable_index.push_back({0,1,2}); // Indices: cosThetaW, cosThetae, Menu
     
     binning.push_back({20,10,20});
     binning.push_back({20,10,20});

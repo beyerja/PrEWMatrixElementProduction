@@ -113,8 +113,8 @@ void GridAsciiToTTree(){
     file_description.push_back("grid_sw_sl0qq_minus");
     file_description.push_back("grid_sw_sl0qq_plus");
     
-    n_process_variables["grid_sw_sl0qq_minus"] = 6;
-    n_process_variables["grid_sw_sl0qq_plus"] = 6;
+    n_process_variables["grid_sw_sl0qq_minus"] = 3;
+    n_process_variables["grid_sw_sl0qq_plus"] = 3;
     
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(20);
     MAXFileIndicesOfProcesses["grid_sw_sl0qq_minus"].push_back(10);
